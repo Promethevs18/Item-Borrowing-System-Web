@@ -1,24 +1,25 @@
-import logo from './logo.svg';
 import './App.css';
+import { ToastContainer } from 'react-toastify';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Authenticate from './Pages/Authenticate';
+import AdminDash from './Pages/Admin/Admin_Dash'
+import ClientDash from './Pages/Client/Client_Dash'
+import 'react-toastify/dist/ReactToastify.min.css';
+import auth from './firebase'
+
 
 function App() {
   return (
+    <Router>
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ToastContainer position='top-center' theme='colored' autoClose={3000}/>
+      <Routes>
+        <Route path="/" element={<Authenticate/>} />
+        <Route path='/admin_dash' element={<AdminDash/>}/>
+        <Route path='/client_dash' element={<ClientDash/>}/>
+      </Routes>
     </div>
+    </Router>
   );
 }
 
