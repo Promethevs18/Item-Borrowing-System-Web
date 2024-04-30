@@ -1,43 +1,55 @@
-import { Box, Fab, Typography } from '@mui/material';
-import React from 'react';
+import { Box,Button,DialogActions,DialogContentText,Fab, TextField, Typography } from '@mui/material';
+import  Dialog from "@mui/material/Dialog"
+import DialogTitle from "@mui/material/DialogTitle"
+import DialogContent from '@mui/material/DialogContent';
+import React, { useState } from 'react';
 import GoogleIcon from '@mui/icons-material/Google';
 import EmailIcon from '@mui/icons-material/Email';
 import { toast } from 'react-toastify';
 import { auth } from '../firebase'
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, getAuth, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { Form, Formik } from 'formik';
 
-const Authenticate = () => {
+const Authenticate = ({ user }) => {
 
   //for Google Authentication
  const GoogleProv = new GoogleAuthProvider();
 
+ //for opening the dialog
+ const [openDialog, setOpenDialog] = useState(false);
+
   const googlePressed = () => {
     signInWithPopup(auth, GoogleProv).then((resulta) => {
-      const creds = GoogleAuthProvider.credentialFromResult(resulta);
-      const token = creds.accessToken;
-
       const user = resulta.user;
-
       console.log(user)
     }).catch((error) => {
       // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
+        toast.error(error)
     });
   }
 
   const emailPressed = () => {
-    toast.success("Email is pressed")
+    setOpenDialog(true);
+  }
+  
+  const closeDialog = () => {
+    setOpenDialog(false)
   }
 
+  const emailLogIn = (values) => {
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, values.email, values.password)
+    .then((result) =>{
+      
+    })
+    .catch((error)=>{
+      console.log(error.message)
+    })
+  }
 
     return (
       <Box>
-          <Box
+          <Box 
            sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -85,6 +97,46 @@ const Authenticate = () => {
                 <EmailIcon sx={{mr: 1}}/>
                 Log in using email
               </Fab>
+              <Dialog 
+                  open={openDialog}
+                  onClose={closeDialog}
+              >
+                  <Formik initialValues={{email: '', password: ''}} onSubmit={emailLogIn}>
+                      {({handleChange}) => (
+                        <Form>
+                          <DialogTitle>Please Enter Credentials Here</DialogTitle>
+                          <DialogContent>
+                            <DialogContentText>Use your email and password to login</DialogContentText>
+                            <TextField 
+                                variant='filled'
+                                fullWidth
+                                id='email'
+                                label='Email'
+                                name='email'
+                                type='text'
+                                required
+                                onChange={handleChange}
+                                />
+                            <TextField
+                                variant='filled'
+                                fullWidth
+                                id='password'
+                                label='Password'
+                                name='password'
+                                type='password'
+                                required
+                                onChange={handleChange}
+                                />
+                          </DialogContent>
+                          <DialogActions>
+                            <Button onClick={closeDialog}>Cancel</Button>
+                            <Button type='submit'>Proceed</Button>
+                          </DialogActions>
+                        </Form>
+                      )}
+                  </Formik>
+
+              </Dialog>
           </Box>
       </Box>
     );
