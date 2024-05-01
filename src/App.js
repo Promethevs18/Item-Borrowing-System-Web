@@ -12,6 +12,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { CssBaseline } from '@mui/material';
+import AddItem from './Pages/Admin/AddItem';
 
 
 function App() {
@@ -37,9 +38,18 @@ function App() {
       <CssBaseline/>
       <ToastContainer position='top-center' theme='colored' autoClose={3000}/>
       <Routes>
-        <Route path="/" element={<Authenticate user={user} />} />
-        <Route path="/adminDash" element={<AdminDash/>}/>
-        <Route path="/clientDash" element={<ClientDash/>}/>
+        <Route path="/" element={<Authenticate />} />
+        
+        
+        <Route path="/adminDash" element={<AdminDash user={user}/>}/>
+        <Route path='/addItem' element={<AddItem user={user}/>}/>
+
+
+
+
+
+
+        <Route path="/clientDash" element={<ClientDash user={user}/>}/>
       </Routes>
     </div>
     </Router>

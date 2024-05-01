@@ -9,6 +9,8 @@ import { toast } from 'react-toastify';
 import { auth } from '../firebase'
 import { GoogleAuthProvider, getAuth, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { Form, Formik } from 'formik';
+import { useNavigate } from 'react-router-dom';
+
 
 const Authenticate = ({ user }) => {
 
@@ -18,10 +20,15 @@ const Authenticate = ({ user }) => {
  //for opening the dialog
  const [openDialog, setOpenDialog] = useState(false);
 
+ //for using in history
+  const history = useNavigate(); 
+
   const googlePressed = () => {
     signInWithPopup(auth, GoogleProv).then((resulta) => {
       const user = resulta.user;
       console.log(user)
+      history('/clientDash')
+      toast.success('You are now logged in')
     }).catch((error) => {
       // Handle Errors here.
         toast.error(error)
@@ -39,11 +46,12 @@ const Authenticate = ({ user }) => {
   const emailLogIn = (values) => {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, values.email, values.password)
-    .then((result) =>{
-      
+    .then(() =>{
+      history('/adminDash')
+      toast.success('You are now logged in')
     })
     .catch((error)=>{
-      console.log(error.message)
+      toast.error(error.message)
     })
   }
 
