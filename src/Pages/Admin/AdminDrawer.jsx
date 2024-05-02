@@ -30,8 +30,8 @@ const AdminDrawer = ({user}) => {
                     onMouseLeave={handleMouseLeave}
                    
             >
-                <Box sx={{width: 250, height: '100%', background: "#a6783f"}} role='presentation'>
-                        <List>
+                <Box sx={{width: 250, height: '100%', background: "#8c2e40"}} role='presentation'>
+                        <List sx={{color: 'white'}}>
                             <Avatar 
                                     alt='userProfile' 
                                     src='https://image.pngaaa.com/743/6496743-middle.png'
@@ -39,7 +39,7 @@ const AdminDrawer = ({user}) => {
                                     />
                             <ListItem>
                                 <ListItemButton onClick={() => navigate('/adminDash')}>
-                                    <ListItemIcon>
+                                    <ListItemIcon sx={{color: 'white'}}>
                                         <Dashboard/>
                                     </ListItemIcon>
                                     <ListItemText primary='Dashboard'/>
@@ -47,7 +47,7 @@ const AdminDrawer = ({user}) => {
                             </ListItem>
                             <ListItem>
                                 <ListItemButton onClick={() => navigate('/addItem')}>
-                                    <ListItemIcon>
+                                    <ListItemIcon sx={{color: 'white'}}>
                                         <PlaylistAdd/>
                                     </ListItemIcon>
                                     <ListItemText primary='Add Item'/>

@@ -13,6 +13,7 @@ body,
   min-height: 100vh;
   display: flex;
   position: relative;
+  background-color: #a46517;
 }
 
 ::-webkit-scrollbar {
@@ -21,7 +22,7 @@ body,
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #7d0f0f;
+  background: #d9cb06;
 }
 
 /* Handle */

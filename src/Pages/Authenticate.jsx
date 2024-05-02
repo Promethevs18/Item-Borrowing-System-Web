@@ -1,4 +1,4 @@
-import { Box,Button,DialogActions,DialogContentText,Fab, TextField, Typography } from '@mui/material';
+import { Box,Button,CircularProgress,DialogActions,DialogContentText,Fab, TextField, Typography } from '@mui/material';
 import  Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle"
 import DialogContent from '@mui/material/DialogContent';
@@ -12,7 +12,7 @@ import { Form, Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 
 
-const Authenticate = ({ user }) => {
+const Authenticate = () => {
 
   //for Google Authentication
  const GoogleProv = new GoogleAuthProvider();
@@ -20,13 +20,16 @@ const Authenticate = ({ user }) => {
  //for opening the dialog
  const [openDialog, setOpenDialog] = useState(false);
 
+ //for opening the loading
+ const [openLoad, setOpenLoad] = useState(false)
+
  //for using in history
   const history = useNavigate(); 
 
   const googlePressed = () => {
-    signInWithPopup(auth, GoogleProv).then((resulta) => {
-      const user = resulta.user;
-      console.log(user)
+    setOpenLoad(true);
+    signInWithPopup(auth, GoogleProv).then(() => {
+      setOpenLoad(false);
       history('/clientDash')
       toast.success('You are now logged in')
     }).catch((error) => {
@@ -44,9 +47,11 @@ const Authenticate = ({ user }) => {
   }
 
   const emailLogIn = (values) => {
+    setOpenLoad(true);
     const auth = getAuth();
     signInWithEmailAndPassword(auth, values.email, values.password)
     .then(() =>{
+      setOpenLoad(false)
       history('/adminDash')
       toast.success('You are now logged in')
     })
@@ -56,7 +61,22 @@ const Authenticate = ({ user }) => {
   }
 
     return (
-      <Box>
+      <Box sx={{background: 'white', minHeight: '100vh'}}>
+      
+      {/* Loading element */}
+      {openLoad !== false && (
+        <Box
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9999,
+          }}
+        >
+          <CircularProgress sx={{ color: 'blue' }} size="80px" />
+        </Box>
+      )}
           <Box 
            sx={{
             display: 'flex',
@@ -86,12 +106,12 @@ const Authenticate = ({ user }) => {
               }}
             >College of Engineering</Typography>
           </Box>
-          <Box m='10px'>
+          <Box m='10px' display='grid' justifyContent='center'>
 
               <Typography variant='h2' fontSize='50px' fontWeight='bold' marginTop='10px'>
                 INVENTORY MANAGEMENT SYSTEM
               </Typography>
-              <Typography variant='h4' fontSize="20px" fontStyle='oblique'>
+              <Typography variant='h4' fontSize="20px" fontStyle='oblique' marginLeft='90px'>
               A Web and Mobile Application With QR Integration and Cloud Computing
               </Typography>
               

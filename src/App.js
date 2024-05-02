@@ -34,7 +34,10 @@ function App() {
   return (
 
     <Router>
-    <div className="App">
+    <div className="app">
+      <main className='content'>
+
+
       <CssBaseline/>
       <ToastContainer position='top-center' theme='colored' autoClose={3000}/>
       <Routes>
@@ -51,6 +54,7 @@ function App() {
 
         <Route path="/clientDash" element={<ClientDash user={user}/>}/>
       </Routes>
+      </main>
     </div>
     </Router>
   );
