@@ -84,7 +84,7 @@ const Authenticate = () => {
             alignItems: 'center',
             justifyContent: 'center',
             height: '55vh',
-            backgroundImage: `url('https://firebasestorage.googleapis.com/v0/b/item-borrowing-system.appspot.com/o/Rectangle%201.png?alt=media&token=525c6685-89cc-4cda-a2d9-15cc3175d46a')`,
+            backgroundImage: `url('https://firebasestorage.googleapis.com/v0/b/item-borrowing-system.appspot.com/o/Rectangle%201%20(1).png?alt=media&token=821a6e08-430d-45a3-aff6-38d0d287dfa2')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -106,17 +106,29 @@ const Authenticate = () => {
               }}
             >College of Engineering</Typography>
           </Box>
-          <Box m='10px' display='grid' justifyContent='center'>
-
-              <Typography variant='h2' fontSize='50px' fontWeight='bold' marginTop='10px'>
-                INVENTORY MANAGEMENT SYSTEM
+          <Box m='10px' display='flex' justifyContent='center'>
+              <Typography variant='h2' fontSize='50px' fontWeight='bold' marginTop='10px' >
+                  QR-CLaIMS
               </Typography>
-              <Typography variant='h4' fontSize="20px" fontStyle='oblique' marginLeft='90px'>
-              A Web and Mobile Application With QR Integration and Cloud Computing
-              </Typography>
-              
           </Box>
+          <Box m='10px' display='flex' justifyContent='center'>
+              <Typography variant='h4' fontSize="20px" fontStyle='oblique' >
+                  A Cloud Based Laboratory Inventory Management System Using Web and Mobile Application with QR Code Integration
+                  </Typography>
+          </Box>
+             
+          
+          {/* For the buttons */}
           <Box mt='50px' display='flex' justifyContent='space-evenly'>
+              <Typography variant='h3' fontSize='20px'>
+                Faculty/Student Sign in
+              </Typography>
+
+              <Typography variant='h3' fontSize='20px'>
+                Administrator Sign in
+              </Typography>
+          </Box>
+          <Box mt='20px' display='flex' justifyContent='space-evenly'>
               <Fab variant='extended' sx={{background: 'red', color: 'white'}} onClick={googlePressed}>
                 <GoogleIcon sx={{mr: 1}}/>
                 Continue with Google

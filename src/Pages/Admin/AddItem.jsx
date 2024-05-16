@@ -1,13 +1,14 @@
 import { Box, Button, CircularProgress, Grid, TextField, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AdminDrawer from './AdminDrawer'
 import Header from '../Header'
 import * as yup from 'yup'
 import { Form, Formik } from 'formik'
-import { doc, getFirestore, setDoc } from 'firebase/firestore'
+import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 import { CloudUpload, UploadFile } from '@mui/icons-material'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
+import { DataGrid } from '@mui/x-data-grid'
 
 const AddItem = () => {
   
@@ -83,6 +84,52 @@ const AddItem = () => {
         );
     };
 
+    const receiptChanger = (event) => {
+      setOpenWithNum(true);
+      const file = event.target.files[0];
+      const storageRef = ref(storage, `receipt-images/${file.name}`)
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setProgress(progress);
+          },
+          (error) => {
+            toast.info(`File upload disrupted due to: ${error}`);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setItemImage(downloadURL);
+              setOpenWithNum(false);
+              toast.success("File uploaded successfully!")
+            });
+          }
+        );
+    };
+
+
+    //For the DataGrid
+    const columns = [
+      {field:'iic', headerName:'I.I.C', flex:1},
+      {field:'assetName', headerName:'Asset Name', flex:1},
+      {field:'brandModel', headerName:'Brand Model', flex:1},
+      {field:'genSpecs', headerName:'Genereal Specifications', flex:1},
+      {field:'location', headerName:'Location', flex:1},
+    ]
+
+    const [rows, setRows] = useState([])
+
+    useEffect(() => {
+      const getData = async () =>{
+        const querySnapshot = await getDocs(collection(db, "Items"));
+        const data = querySnapshot.docs.map((map) => ({id: map.id, ...map.data()}))
+
+        setRows(data)
+      }
+      getData()
+    })
 
   return (
     <Box display='grid'> 
@@ -154,7 +201,7 @@ const AddItem = () => {
                         error={!!touched.iic && !!errors.iic}
                         helperText={touched.iic && errors.iic}
                         sx={{
-                          width: '300px',
+                          width: '350px',
                           gridColumn: 'span 2',
                           "& .MuiInputBase-root":{
                             color: 'white'
@@ -175,7 +222,7 @@ const AddItem = () => {
                         error={!!touched.assetName && !!errors.assetName}
                         helperText={touched.assetName && errors.assetName}
                         sx={{
-                          width: '300px',
+                          width: '400px',
                           gridColumn: 'span 2',
                           "& .MuiInputBase-root":{
                             color: 'white'
@@ -202,7 +249,7 @@ const AddItem = () => {
                         error={!!touched.brandModel && !!errors.brandModel}
                         helperText={touched.brandModel && errors.brandModel}
                         sx={{
-                          width: '300px',
+                          width: '350px',
                           gridColumn: 'span 2',
                           "& .MuiInputBase-root":{
                             color: 'white'
@@ -223,7 +270,7 @@ const AddItem = () => {
                         error={!!touched.genSpecs && !!errors.genSpecs}
                         helperText={touched.genSpecs && errors.genSpecs}
                         sx={{
-                          width: '300px',
+                          width: '400px',
                           gridColumn: 'span 2',
                           "& .MuiInputBase-root":{
                             color: 'white'
@@ -234,7 +281,7 @@ const AddItem = () => {
                   </Grid>
                   </Box>
 
-                        {/* Third textfield and a button */}
+                        {/* Third textfield and buttons */}
                   <Box m='5px' marginTop='40px'>
                     <Grid>
                     <TextField
@@ -260,9 +307,20 @@ const AddItem = () => {
                             startIcon={<CloudUpload/>}
                             sx={{marginLeft: '20px', background: 'brown'}}
                         >
-                          Upload a photo
+                          Upload item photo
                           <input style={{display: 'none'}} type='file' accept='image/' onChange={imageChanger} id='imageinput'/>
                         </Button>
+
+                        <Button variant='contained' component='label'
+                            startIcon={<CloudUpload/>}
+                            sx={{marginLeft: '20px', background: 'brown'}}
+                        >
+                          Upload receipt photo
+                          <input style={{display: 'none'}} type='file' accept='image/' onChange={receiptChanger} id='receiptImage'/>
+                        </Button>
+
+
+                        
                     </Grid>
                   </Box>
                   
@@ -276,8 +334,34 @@ const AddItem = () => {
 
             </Formik>
 
-            <Box>
-              Heil
+            <Box
+            display='flex' height='75vh' width='50%' m='20px'
+            sx={{
+             "& .MuiDataGrid-root": {
+               border: "none",
+             },
+             "& .MuiDataGrid-cell": {
+               borderBottom: "none",
+             },
+             "& .name-column--cell": {
+               color: "#303030",
+             },
+             "& .MuiDataGrid-columnHeaders": {
+               backgroundColor: "#ba828c",
+               borderBottom: "none",
+             },
+             "& .MuiDataGrid-virtualScroller": {
+              //  backgroundColor: colors.yellow[700],
+             },
+             "& .MuiDataGrid-footerContainer": {
+               borderTop: "none",
+              //  backgroundColor: colors.maroon[600],
+             },
+             "& .MuiButtonBase-root":{
+              //  color: colors.white[200]
+             }
+           }}>
+              <DataGrid rows={rows} columns={columns}/>
             </Box>
         </Box>
       <AdminDrawer/>
