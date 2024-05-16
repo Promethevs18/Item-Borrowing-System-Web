@@ -8,7 +8,7 @@ import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firesto
 import { toast } from 'react-toastify'
 import { CloudUpload, UploadFile } from '@mui/icons-material'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 
 const AddItem = () => {
   
@@ -222,7 +222,7 @@ const AddItem = () => {
                         error={!!touched.assetName && !!errors.assetName}
                         helperText={touched.assetName && errors.assetName}
                         sx={{
-                          width: '400px',
+                          width: '350px',
                           gridColumn: 'span 2',
                           "& .MuiInputBase-root":{
                             color: 'white'
@@ -270,7 +270,7 @@ const AddItem = () => {
                         error={!!touched.genSpecs && !!errors.genSpecs}
                         helperText={touched.genSpecs && errors.genSpecs}
                         sx={{
-                          width: '400px',
+                          width: '350px',
                           gridColumn: 'span 2',
                           "& .MuiInputBase-root":{
                             color: 'white'
@@ -313,7 +313,7 @@ const AddItem = () => {
 
                         <Button variant='contained' component='label'
                             startIcon={<CloudUpload/>}
-                            sx={{marginLeft: '20px', background: 'brown'}}
+                            sx={{marginLeft: '20px', background: 'brown', marginTop: '20px'}}
                         >
                           Upload receipt photo
                           <input style={{display: 'none'}} type='file' accept='image/' onChange={receiptChanger} id='receiptImage'/>
@@ -335,10 +335,10 @@ const AddItem = () => {
             </Formik>
 
             <Box
-            display='flex' height='75vh' width='50%' m='20px'
+            display='flex' height='75vh' width='50%' marginLeft='20px'
             sx={{
              "& .MuiDataGrid-root": {
-               border: "none",
+               border: "none"
              },
              "& .MuiDataGrid-cell": {
                borderBottom: "none",
@@ -351,17 +351,17 @@ const AddItem = () => {
                borderBottom: "none",
              },
              "& .MuiDataGrid-virtualScroller": {
-              //  backgroundColor: colors.yellow[700],
+             //backgroundColor: colors.yellow[700],
              },
              "& .MuiDataGrid-footerContainer": {
                borderTop: "none",
-              //  backgroundColor: colors.maroon[600],
+               backgroundColor: "#8c2e40"
              },
              "& .MuiButtonBase-root":{
-              //  color: colors.white[200]
+               color: "white"
              }
            }}>
-              <DataGrid rows={rows} columns={columns}/>
+              <DataGrid rows={rows} columns={columns} slots={{toolbar: GridToolbar}}/>
             </Box>
         </Box>
       <AdminDrawer/>
