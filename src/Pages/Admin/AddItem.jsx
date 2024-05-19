@@ -1,6 +1,5 @@
 import { Box, Button, CircularProgress, Grid, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import AdminDrawer from './AdminDrawer'
 import Header from '../Header'
 import * as yup from 'yup'
 import { Form, Formik } from 'formik'
@@ -364,7 +363,6 @@ const AddItem = () => {
               <DataGrid rows={rows} columns={columns} slots={{toolbar: GridToolbar}}/>
             </Box>
         </Box>
-      <AdminDrawer/>
     </Box>
  
   )

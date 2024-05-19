@@ -13,6 +13,8 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { CssBaseline } from '@mui/material';
 import AddItem from './Pages/Admin/AddItem';
+import Calibration from './Pages/Admin/Calibration';
+import AdminDrawer from './Pages/Admin/AdminDrawer';
 
 
 function App() {
@@ -39,6 +41,7 @@ function App() {
 
 
       <CssBaseline/>
+      <AdminDrawer/>
       <ToastContainer position='top-center' theme='colored' autoClose={3000}/>
       <Routes>
         <Route path="/" element={<Authenticate />} />
@@ -46,7 +49,7 @@ function App() {
         
         <Route path="/adminDash" element={<AdminDash user={user}/>}/>
         <Route path='/addItem' element={<AddItem user={user}/>}/>
-
+        <Route path='/calibration' element={<Calibration user={user}/>}/>
 
 
 

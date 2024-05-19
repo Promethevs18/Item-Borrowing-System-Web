@@ -25,7 +25,7 @@ const Admin_Dash = ({user}) => {
             fontWeight="bold"
             color="white"
           >
-            School Philosophy
+           Philosophy
           </Typography>
           <Box
             display="flow"
