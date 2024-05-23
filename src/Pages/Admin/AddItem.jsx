@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
 import { CloudUpload, UploadFile } from '@mui/icons-material'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
+import AdminDrawer from './AdminDrawer'
 
 const AddItem = () => {
   
@@ -363,7 +364,9 @@ const AddItem = () => {
               <DataGrid rows={rows} columns={columns} slots={{toolbar: GridToolbar}}/>
             </Box>
         </Box>
+        <AdminDrawer/>
     </Box>
+    
  
   )
 }

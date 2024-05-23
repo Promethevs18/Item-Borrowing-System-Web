@@ -1,4 +1,4 @@
-import { CompassCalibration, Dashboard, PlaylistAdd } from '@mui/icons-material';
+import { AssignmentReturn, CompassCalibration, Dashboard, PlaylistAdd } from '@mui/icons-material';
 import { Avatar, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
@@ -61,10 +61,19 @@ const AdminDrawer = ({user}) => {
                                     <ListItemText primary='Calibrate Items'/>
                                 </ListItemButton>
                             </ListItem>
+                            <ListItem>
+                                <ListItemButton onClick={() => navigate('/returns')}>
+                                    <ListItemIcon sx={{color: 'white'}}>
+                                        <AssignmentReturn/>
+                                    </ListItemIcon>
+                                    <ListItemText primary='Return Items'/>
+                                </ListItemButton>
+                            </ListItem>
                         </List>
                 </Box>
             </Drawer>
         </Box>
+
     </Box>
   )
 }

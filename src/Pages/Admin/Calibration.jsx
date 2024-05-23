@@ -2,11 +2,13 @@ import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch, Tex
 import React, { useEffect, useRef, useState } from 'react'
 import Header from '../Header'
 import { Form, Formik } from 'formik'
-import { DataGrid, GridToolbar } from '@mui/x-data-grid'
-import { getDatabase } from 'firebase/database'
+import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid'
 import * as yup from 'yup'
-import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
+import DeleteIcon from '@mui/icons-material/Delete';
+import AdminDrawer from './AdminDrawer'
+
 
 const Calibration = () => {
 
@@ -72,6 +74,14 @@ const Calibration = () => {
             getData();
             })
 
+
+            const burahin = async (laman) => {
+              setOpenLoad(true)
+               await deleteDoc(doc(database, "Calibrated Items", `${laman}`)).then(()=>{
+                setOpenLoad(false)
+                toast.success("Data deleted succesfully!")
+               });
+            }
         
 
           const dataColumns = [
@@ -82,6 +92,16 @@ const Calibration = () => {
             { field: "manufacturerName", headerName: "Manufacturer's Name", flex: 1},
             { field: "stickerNo", headerName: "Sticker No.", flex: 1},
             { field: "dateCalibrated", headerName: "Date Calibrated", flex: 1},
+            { field: "actions", type: 'actions', headerName: 'Action', flex: 1, getActions: (params) => [
+              <GridActionsCellItem
+                icon={<DeleteIcon/>}
+                label='Delete'
+                onClick={() => {
+                  burahin(params.id)
+                }}
+                sx={{color: 'red'}}
+                />
+              ]}
           ];
 
   return (
@@ -289,7 +309,7 @@ const Calibration = () => {
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: 'darkkhaki',
+            backgroundColor: '#8c2e40',
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
@@ -318,6 +338,7 @@ const Calibration = () => {
         />
       </Box>
     </Box>
+    <AdminDrawer/>
     </Box>
   )
 }
