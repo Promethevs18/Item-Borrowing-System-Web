@@ -2,6 +2,9 @@ import { AssignmentReturn, CompassCalibration, Dashboard, PlaylistAdd } from '@m
 import { Avatar, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import { toast } from 'react-toastify';
+import { getAuth, signOut } from 'firebase/auth';
 
 const AdminDrawer = ({user}) => {
     
@@ -15,8 +18,14 @@ const AdminDrawer = ({user}) => {
     const handleMouseLeave = () => {
         setOpen(false);
     }
-
-    console.log(user)
+    const logoutUser = () => {
+        if(user?.uid){
+            signOut(getAuth()).then(()=>{
+                toast.success("You have successfully logged out!");
+                navigate("/")
+            })
+        } 
+    }
     
 
   return (
@@ -36,6 +45,8 @@ const AdminDrawer = ({user}) => {
                                     alt='userProfile' 
                                     src='https://image.pngaaa.com/743/6496743-middle.png'
                                     sx={{height: '150px', width: '150px', boxShadow: '20px', m: '20px', marginLeft: '40px'}}
+                                    style={{cursor: 'pointer'}}
+                                    onClick={() => logoutUser()}
                                     />
                             <ListItem>
                                 <ListItemButton onClick={() => navigate('/adminDash')}>
@@ -67,6 +78,14 @@ const AdminDrawer = ({user}) => {
                                         <AssignmentReturn/>
                                     </ListItemIcon>
                                     <ListItemText primary='Return Items'/>
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemButton onClick={() => navigate('/accountManagement')}>
+                                    <ListItemIcon sx={{color: 'white'}}>
+                                        <GroupAddIcon/>
+                                    </ListItemIcon>
+                                    <ListItemText primary='Account Management'/>
                                 </ListItemButton>
                             </ListItem>
                         </List>

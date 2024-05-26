@@ -3,6 +3,8 @@ import { Avatar, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, List
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { getAuth, signOut } from 'firebase/auth';
+import { toast } from 'react-toastify';
 
 const ClientDrawer = ({ user: initialUser}) => {
    
@@ -17,6 +19,15 @@ const ClientDrawer = ({ user: initialUser}) => {
 
   const handleMouseLeave = () => {
       setOpen(false);
+  }
+
+  const logOutUser = () => {
+    if(user?.uid){
+        signOut(getAuth()).then(() => {
+            toast.success("You have successfully logged out!")
+            navigate("/")
+        })
+    }
   }
 
   useEffect(() => {
@@ -50,6 +61,8 @@ return (
                                   alt='userProfile' 
                                   src={user.photoURL}
                                   sx={{height: '150px', width: '150px', boxShadow: '20px', m: '20px', marginLeft: '50px'}}
+                                  style={{cursor: 'pointer'}}
+                                  onClick={() => logOutUser()}
                                   />
                            <Box display='flex' alignItems='center' flexDirection='column' marginBottom='30px'>
                            <Typography variant='h2' fontSize='20px' fontWeight='bold'>{user.displayName}</Typography>
