@@ -17,6 +17,7 @@ import Calibration from './Pages/Admin/Calibration';
 import Returns from './Pages/Admin/Returns';
 import ClientAccount from './Pages/Client/Client_Account';
 import AccountManagement from './Pages/Admin/AccountManagement';
+import Request from './Pages/Admin/Request';
 
 
 function App() {
@@ -53,6 +54,7 @@ function App() {
         <Route path='/calibration' element={<Calibration user={user}/>}/>
         <Route path='/returns' element={<Returns user={user}/>}/>
         <Route path="/accountManagement" element={<AccountManagement user={user}/>}/>
+        <Route path='/requests' element={<Request user={user}/>}/>
 
 
         <Route path="/clientDash" element={<ClientDash user={user}/>}/>
