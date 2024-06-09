@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Switch, TextField, Typography } from '@mui/material'
+import { Avatar, Box, Button, Card, CardContent, CircularProgress, FormControl, Grid, InputLabel, MenuItem, Select, Switch, TextField, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import AdminDrawer from './AdminDrawer'
 import Header from '../Header'
@@ -8,11 +8,11 @@ import * as yup from 'yup'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 import { Form, Formik } from 'formik'
 import { toast } from 'react-toastify'
-import { DataGrid, GridToolbar } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid'
+import CustomToolBar from '../CustomToolBar'
 
 
 const AccountManagement = () => {
-
 
     const [profileImage, setProfileImage] = useState('https://www.pngkey.com/png/detail/157-1579943_no-profile-picture-round.png')
     const unangValues = {
@@ -31,9 +31,8 @@ const AccountManagement = () => {
     const innerRef = useRef(null)
     const [status, setStatus] = useState('')
     const [desc, setDesc] = useState('Deactivated')
+    const [accountLevel, setAccountLevel] = useState([])
 
-
-    //for category radio button
     const [selectedCategory, setCategory] = useState('')
     const categoryChange = (event) => {
         setCategory(event.target.value)
@@ -46,7 +45,6 @@ const AccountManagement = () => {
         password: yup.string().required("This field is required"),
     })
 
-    //profileImageChanger
     const profileImageChanger = (event) => {
         const file = event.target.files[0];
         setOpenLoad(true);
@@ -62,13 +60,11 @@ const AccountManagement = () => {
         })
     }
 
-    //switcher changer
     const switchChanger = (event) => {
       setDesc(event.target.checked ? "Activated" : "Deactivated")
       setStatus(event.target.checked ? "Activated" : "Deactivated")
     }
 
-    //Create an account
     const signInToSystem  = async (values) => {
       setOpenLoad(true);
         try{
@@ -80,8 +76,8 @@ const AccountManagement = () => {
                    setDoc(doc(db, "Users list", values.fullName), {
                     ...values,
                     profileImage: profileImage,
-                    category: selectedCategory,
-                    status: status
+                    status: status,
+                    accountLevel: accountLevel
                   }).then(() => {
                     signInWithEmailAndPassword(auth, "admin@item.borrow", "admin123")
                   }).catch((error) => {
@@ -89,7 +85,6 @@ const AccountManagement = () => {
                   })
               })
               toast.success("Account activated")
-           
             })
         }
         catch (error) {
@@ -98,8 +93,6 @@ const AccountManagement = () => {
         setOpenLoad(false)
     }
 
-
-    //DATAGRID columns
     const dataColumn = [
       { field: "fullName", headerName: "Full Name", flex: 1},
       { field: "category", headerName: "Category", flex: 1},
@@ -119,33 +112,37 @@ const AccountManagement = () => {
       getData();
     },[db])
 
+    const levelChanger = (event) => {
+      setAccountLevel(event.target.value);
+    }
 
-  return (
-    <Box m='10px' display='block' justifyContent='center'>
-              <AdminDrawer/>
+    return (
+        <Box m='10px' display='block' justifyContent='center'>
+            <AdminDrawer />
             {openLoad && (
                 <CircularProgress 
-                sx={{ color: 'blue', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}
+                sx={{ color: 'yellow', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}
                 size="80px" 
                 />
             )}
-      
-        <Header title='Account Management' description='This page allows the administrators to extend access to other accounts'/>
-         
-        <Box  m='20px' marginTop='50px'>
-            <Typography variant='h3' fontSize='30px' color='whitesmoke' sx={{textShadow: ' -1px -1px 0 #000, -1px -1px 0 #000, -1px -1px 0 #000, -1px -1px 0 #000'}}>Add Account</Typography>
-        </Box> 
+            
+            <Header title='Account Management' description='This page allows the administrators to extend access to other accounts' />
+            
+            <Box m='20px' marginTop='50px'>
+                <Typography variant='h3' fontSize='30px' color='maroon' sx={{textShadow: '0px 0px 3px #000'}}>
+                    Add Account
+                </Typography>
+            </Box> 
 
-        <Box display='flex' m='20px' justifyContent='space-evenly' marginTop='50px'>
+            <Box display='flex' m='20px' justifyContent='space-evenly' marginTop='50px'>
                 <label htmlFor='profileImage' style={{cursor: 'pointer'}}>
                     <Avatar alt='defaultPhoto' 
                             src={profileImage}
                             sx={{height: '250px', width: '250px', marginTop: '30px'}}>
                     </Avatar>
                 </label>
-                    <input style={{display: 'none'}} type='file' accept='image/' onChange={profileImageChanger} id='profileImage'/>
-
-                {/* Forms */}
+                <input style={{display: 'none'}} type='file' accept='image/' onChange={profileImageChanger} id='profileImage'/>
+                
                 <Box m='20px'>
                    <Formik 
                         initialValues={unangValues}
@@ -169,7 +166,7 @@ const AccountManagement = () => {
                                           name='email'
                                           error={!!touched.email && !!errors.email}
                                           helperText={touched.email && errors.email}
-                                          sx={{ width: '350px', "& .MuiInputBase-root": { color: 'white' } }}
+                                          sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
                                         />
                                       </Grid>
                                       <Grid item>
@@ -184,7 +181,7 @@ const AccountManagement = () => {
                                           name='fullName'
                                           error={!!touched.fullName && !!errors.fullName}
                                           helperText={touched.fullName && errors.fullName}
-                                          sx={{ width: '350px', "& .MuiInputBase-root": { color: 'white' } }}
+                                          sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
                                         />
                                       </Grid>
                                     </Grid>
@@ -192,19 +189,20 @@ const AccountManagement = () => {
                                   <Box m='5px' marginTop='40px'>
                                     <Grid container spacing={2}>
                                       <Grid item>
-                                        <TextField
-                                          fullWidth
-                                          variant='filled'
-                                          type='text'
-                                          label='Account Level'
-                                          onBlur={handleBlur}
-                                          onChange={handleChange}
-                                          value={values.brandModel}
-                                          name='accountLevel'
-                                          error={!!touched.accountLevel && !!errors.accountLevel}
-                                          helperText={touched.accountLevel && errors.accountLevel}
-                                          sx={{ width: '350px', "& .MuiInputBase-root": { color: 'white' } }}
-                                        />
+                                        <FormControl
+                                          fullWidth sx={{width:'200px'}}>
+                                            <InputLabel>Select a level</InputLabel>
+                                            <Select value={accountLevel} onChange={levelChanger} label="Account Level">
+                                                <MenuItem value="">
+                                                  <em>None</em>
+                                                </MenuItem>
+                                                <MenuItem value="Admin">Admin</MenuItem>
+                                                <MenuItem value="Faculty">Faculty</MenuItem>
+                                                <MenuItem value="COE">COE</MenuItem>
+                                                <MenuItem value="Non-Teaching">Non-Teaching</MenuItem>
+                                                <MenuItem value="Non-COE">Non-COE</MenuItem>
+                                            </Select>
+                                          </FormControl>
                                       </Grid>
                                       <Grid item>
                                         <TextField
@@ -218,7 +216,7 @@ const AccountManagement = () => {
                                           name='password'
                                           error={!!touched.password && !!errors.password}
                                           helperText={touched.password && errors.password}
-                                          sx={{ width: '350px', "& .MuiInputBase-root": { color: 'white' } }}
+                                          sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
                                         />
                                       </Grid>
                                     </Grid>
@@ -231,15 +229,6 @@ const AccountManagement = () => {
                                           {desc}
                                         </Grid>
                                         <Grid item sx={{marginLeft: '105px'}}>
-                                            <FormControl>
-                                              <FormLabel
-                                                style={{color: 'black'}}
-                                              >Category</FormLabel>
-                                              <RadioGroup row onChange={categoryChange}>
-                                                  <FormControlLabel value="Non-Teaching" control={<Radio/>} label="Non-Teaching"/>
-                                                  <FormControlLabel value="Faculty" control={<Radio/>} label="Faculty"/>
-                                              </RadioGroup>
-                                            </FormControl>
                                         </Grid>
                                     </Grid>
                                     <Box display='flex' justifyContent='center' m='20px'>
@@ -252,70 +241,52 @@ const AccountManagement = () => {
                         )}
                     </Formik>
                 </Box>
+            </Box>
 
-              
-             
+            <Box display="block" justifyContent="center" alignItems="center" height="65vh" sx={{ padding: "30px" }}>
+                <Typography variant='h3' fontSize='30px' color='maroon' sx={{textShadow: '0px 0px 3px #000'}}>
+                    Accounts Manifest
+                </Typography>
+                <DataGrid
+                  columns={dataColumn}
+                  rows={accountList}
+                  editMode="row"
+                  slots={{ toolbar: CustomToolBar }}
+                  sx={{
+                    "& .MuiDataGrid-root": {
+                      border: "none",
+                    },
+                    "& .MuiDataGrid-cell": {
+                      borderBottom: "none",
+                      color: 'white',
+                    },
+                    "& .name-column--cell": {
+                      color: 'black',
+                    },
+                    "& .MuiDataGrid-columnHeaders": {
+                      backgroundColor: 'maroon',
+                      borderBottom: "none",
+                      color: 'black',
+                    },
+                    "& .MuiDataGrid-virtualScroller": {
+                      backgroundColor: 'gray',
+                    },
+                    "& .MuiDataGrid-footerContainer": {
+                      borderTop: "none",
+                      backgroundColor: 'gray',
+                      color: 'white',
+                    },
+                    "& .MuiButtonBase-root": {
+                      color: 'Black',
+                    },
+                    "& .MuiDataGrid-virtualScrollerRenderZone": {
+                      color: 'white',
+                    }
+                  }}
+                />
+            </Box>
         </Box>
-                <Box
-                    display="block"
-                    justifyContent="center"
-                    alignItems="center"
-                    height="65vh"
-                    sx={{
-                      padding: "30px",
-                      "& .MuiDataGrid-root": {
-                        border: "none",
-                      },
-                      "& .MuiDataGrid-cell": {
-                        borderBottom: "none",
-                      },
-                      "& .name-column--cell": {
-                        color: 'white',
-                      },
-                      "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: 'maroon',
-                        borderBottom: "none",
-                      },
-                      "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: '#8c2e40',
-                      },
-                      "& .MuiDataGrid-footerContainer": {
-                        borderTop: "none",
-                        backgroundColor: 'white',
-                      },
-                      "& .MuiButtonBase-root":{
-                        color: 'wheat'
-                      },
-                      "& .MuiDataGrid-virtualScrollerRenderZone":{
-                        color: 'white'
-                      }
-                    }}
-                  >
-                    <Typography 
-                      variant='h3' 
-                      fontSize='30px'
-                      color='white'
-                      sx={{textShadow: ' -1px -1px 0 #000, -1px -1px 0 #000, -1px -1px 0 #000, -1px -1px 0 #000' }}
-                      >Accounts Manifest</Typography>
-                    <DataGrid
-                      columns={dataColumn}
-                      rows={accountList}
-                      editMode="row"
-                      slots={
-                        {
-                        toolbar: GridToolbar,
-                      
-                      }}
-                      sx={{
-                        '@media print':{
-                          '.MuiDataGrid-main': { color: 'rgba(0, 0, 0, 0.87)' },
-                        },
-                      }}
-                      
-                    />
-                </Box>
-    </Box>
-  )
+    )
 }
 
 export default AccountManagement

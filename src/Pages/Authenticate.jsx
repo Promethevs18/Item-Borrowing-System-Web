@@ -7,7 +7,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import EmailIcon from '@mui/icons-material/Email';
 import { toast } from 'react-toastify';
 import { auth } from '../firebase'
-import { GoogleAuthProvider, getAuth, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { Form, Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,8 +56,27 @@ const Authenticate = () => {
       toast.success('You are now logged in')
     })
     .catch((error)=>{
+      setOpenLoad(false)
       toast.error(error.message)
     })
+  
+  }
+
+
+  const nalimutan = (value) => {
+    if(value === "" || value === null){
+      toast.error("Write your email on the text field above")
+    }
+    else{
+
+      const newAuth = getAuth();
+      sendPasswordResetEmail(newAuth, value).then(() => {
+        toast.success("Password reset email link sent. Check your inbox")
+      })
+      .catch((error) => {
+        toast.error(error)
+      })
+    }
   }
 
     return (
@@ -142,7 +161,7 @@ const Authenticate = () => {
                   onClose={closeDialog}
               >
                   <Formik initialValues={{email: '', password: ''}} onSubmit={emailLogIn}>
-                      {({handleChange}) => (
+                      {({handleChange, values}) => (
                         <Form>
                           <DialogTitle>Please Enter Credentials Here</DialogTitle>
                           <DialogContent>
@@ -167,6 +186,7 @@ const Authenticate = () => {
                                 required
                                 onChange={handleChange}
                                 />
+                                <Button onClick={() => nalimutan(values.email)}>Forgotten Password</Button>
                           </DialogContent>
                           <DialogActions>
                             <Button onClick={closeDialog}>Cancel</Button>

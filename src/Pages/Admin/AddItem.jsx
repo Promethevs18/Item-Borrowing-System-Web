@@ -1,17 +1,24 @@
-import { Box, Button, CircularProgress, Grid, TextField, Typography } from '@mui/material';
+import {
+  Box, Button, CircularProgress, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography, Modal
+} from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import Header from '../Header';
 import * as yup from 'yup';
 import { Form, Formik } from 'formik';
-import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
+import {
+  collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc
+} from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { CloudUpload, UploadFile } from '@mui/icons-material';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
-import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import AdminDrawer from './AdminDrawer';
 import DeleteIcon from '@mui/icons-material/Delete';
+import QRCode from 'react-qr-code';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CustomToolbar from '../CustomToolBar'
 
-const AddItem = () => {
+const AddItem = ({ user }) => {
   const db = getFirestore();
   const storage = getStorage();
   const [openLoad, setOpenLoad] = useState(false);
@@ -21,8 +28,11 @@ const AddItem = () => {
   const [receiptImage, setReceipt] = useState('');
   const [selectionModel, setSelectionModel] = useState([]);
   const [rows, setRows] = useState([]);
-  
+  const [showForm, setShowForm] = useState(false); // State to control visibility of form
+  const [openDetails, setOpenDetails] = useState(false);
+  const [itemDetails, setItemDetails] = useState({});
   const formikRef = useRef(null);
+  const [status, setStatus] = useState('');
 
   const initialValues = {
     iic: '',
@@ -30,7 +40,9 @@ const AddItem = () => {
     brandModel: '',
     genSpecs: '',
     location: '',
-    receiptImage: ''
+    receiptImage: '',
+    quantity: 0, // Add quantity
+    status: 'Available' // Add status
   };
 
   const validation = yup.object().shape({
@@ -38,7 +50,8 @@ const AddItem = () => {
     assetName: yup.string().required("This field is required"),
     brandModel: yup.string().required("This field is required"),
     genSpecs: yup.string().required("This field is required"),
-    location: yup.string().required("This field is required")
+    location: yup.string().required("This field is required"),
+    quantity: yup.number().required("This field is required").min(1, "Quantity must be at least 1") // Validate quantity
   });
 
   const uploadData = async (values, { resetForm }) => {
@@ -46,13 +59,17 @@ const AddItem = () => {
 
     try {
       await setDoc(doc(db, "Items", values.iic), {
-        ...values, 
-        itemImage: itemImage
+        ...values,
+        itemImage: itemImage,
+        receiptImage: receiptImage,
+        ItemStatus: status
       });
       setOpenLoad(false);
       toast.success("Data uploaded successfully!");
-      resetForm(); 
+      resetForm();
       setReceipt('');
+      setItemImage('');
+      setShowForm(false); // Hide the form after submitting
     } catch (error) {
       setOpenLoad(false);
       toast.info(`Error occurred due to: ${error}`);
@@ -88,6 +105,10 @@ const AddItem = () => {
     uploadFile(file, `item-images/${file.name}`, setItemImage);
   };
 
+  const statusChanger = (event) => {
+    setStatus(event.target.value);
+  };
+
   const receiptChanger = (event) => {
     const file = event.target.files[0];
     uploadFile(file, `receipt-images/${file.name}`, setReceipt);
@@ -116,6 +137,8 @@ const AddItem = () => {
       if (snapshot.exists()) {
         const updatedIni = snapshot.data();
         formikRef.current.setValues(updatedIni);
+        setItemImage(updatedIni.itemImage);
+        setReceipt(updatedIni.receiptImage);
         setOpenLoad(false);
       }
     } catch (error) {
@@ -133,7 +156,25 @@ const AddItem = () => {
       setRows(data);
     };
     getData();
-  }, []);
+  }, [db]);
+
+  const handleButtonClick = () => {
+    setShowForm(true);
+  };
+
+  const handleBackClick = () => {
+    setShowForm(false);
+  };
+
+  const handleItemDetailsClick = (item) => {
+    setItemDetails(item);
+    setOpenDetails(true);
+  };
+
+  const handleDetailsBackClick = () => {
+    setOpenDetails(false);
+  };
+
 
   const columns = [
     { field: 'iic', headerName: 'I.I.C', flex: 1 },
@@ -141,167 +182,275 @@ const AddItem = () => {
     { field: 'brandModel', headerName: 'Brand Model', flex: 1 },
     { field: 'genSpecs', headerName: 'General Specifications', flex: 1 },
     { field: 'location', headerName: 'Location', flex: 1 },
+    { field: 'quantity', headerName: 'Quantity', flex: 1 }, // Add quantity column
+    { field: 'status', headerName: 'Status', flex: 1 }, // Add status column
+    { 
+      field: 'qrCode', 
+      headerName: 'QR Code', 
+      flex: 1,
+      renderCell: (params) => (
+        <QRCode value={params.row.iic} style={{ width: '60px', height: '60px' }}/>
+      )
+    },
     { field: 'actions', type: 'actions', headerName: 'Action', flex: 1, getActions: (params) => [
       <GridActionsCellItem
-        icon={<DeleteIcon />}
+        icon={<DeleteIcon sx={{ color: 'black' }} />}
         label='Delete'
         onClick={() => burahin(params.id)}
-        sx={{ color: 'red' }}
+       
+      />,
+      <GridActionsCellItem
+        icon={<Button variant='contained' color='secondary' onClick={() => handleItemDetailsClick(params.row)}>Details</Button>}
+        label='Details'
       />
     ] }
   ];
 
   return (
-    <Box display='grid'> 
+    <Box>
       {openLoad && (
-        <CircularProgress 
+        <CircularProgress
           sx={{ color: 'blue', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}
-          size="80px" 
+          size="80px"
         />
       )}
       {openWithNum && (
         <Box>
-          <CircularProgress 
+          <CircularProgress
             sx={{ color: 'blue', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}
-            size="80px" 
+            size="80px"
           />
           <Box sx={{ top: '55.5%', left: '52.5%', transform: 'translate(-50%, -50%)', zIndex: 9999, position: 'fixed' }}>
-            <Typography variant="caption" component="div" color="white">{`${Math.round(progress)}%`}</Typography>
+            <Typography variant="caption" component="div" color="black">{`${Math.round(progress)}%`}</Typography>
           </Box>
         </Box>
       )}
-      <Header title='Add item/material' description='Create a new item/material that is ready for students/teachers to borrow' />
+      <Header title='Inventory List' description='Create a new item/material that is ready for students/teachers to borrow' />
       <Box m='20px' justifyContent='space-around' alignSelf='center' display='flex' marginTop='100px'>
-        <Formik 
-          initialValues={initialValues}
-          innerRef={formikRef}
-          validationSchema={validation}
-          onSubmit={uploadData}
-        >
-          {({ values, errors, touched, handleChange, handleBlur }) => (
-            <Form>
-              <Box m='5px'>
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <TextField
-                      fullWidth
-                      variant='filled'
-                      type='text'
-                      label='Inventory Identification Code'
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.iic}
-                      name='iic'
-                      error={!!touched.iic && !!errors.iic}
-                      helperText={touched.iic && errors.iic}
-                      sx={{ width: '350px', "& .MuiInputBase-root": { color: 'white' } }}
-                    />
+        {!showForm && (
+          <Button variant="contained" onClick={handleButtonClick}>Add New Item</Button>
+        )}
+        {showForm && (
+          <Formik
+            initialValues={initialValues}
+            innerRef={formikRef}
+            validationSchema={validation}
+            onSubmit={uploadData}
+          >
+            {({ values, errors, touched, handleChange, handleBlur }) => (
+              <Form>
+                <Box m='5px'>
+                  <Grid container spacing={3}>
+                    <Grid item>
+                      <TextField
+                        fullWidth
+                        variant='filled'
+                        type='text'
+                        label='Inventory Identification Code'
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.iic}
+                        name='iic'
+                        error={!!touched.iic && !!errors.iic}
+                        helperText={touched.iic && errors.iic}
+                        sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        fullWidth
+                        variant='filled'
+                        type='text'
+                        label='Asset Name'
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.assetName}
+                        name='assetName'
+                        error={!!touched.assetName && !!errors.assetName}
+                        helperText={touched.assetName && errors.assetName}
+                        sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        fullWidth
+                        variant='filled'
+                        type='text'
+                        label='Brand Model'
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.brandModel}
+                        name='brandModel'
+                        error={!!touched.brandModel && !!errors.brandModel}
+                        helperText={touched.brandModel && errors.brandModel}
+                        sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                    <TextField
-                      fullWidth
-                      variant='filled'
-                      type='text'
-                      label='Asset Name'
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.assetName}
-                      name='assetName'
-                      error={!!touched.assetName && !!errors.assetName}
-                      helperText={touched.assetName && errors.assetName}
-                      sx={{ width: '350px', "& .MuiInputBase-root": { color: 'white' } }}
-                    />
+                </Box>
+                <Box m='5px' marginTop='40px'>
+                  <Grid container spacing={3}>
+                    <Grid item>
+                      <TextField
+                        fullWidth
+                        variant='filled'
+                        type='text'
+                        label='General Specifications'
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.genSpecs}
+                        name='genSpecs'
+                        error={!!touched.genSpecs && !!errors.genSpecs}
+                        helperText={touched.genSpecs && errors.genSpecs}
+                        sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        fullWidth
+                        variant='filled'
+                        type='text'
+                        label='Location'
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.location}
+                        name='location'
+                        error={!!touched.location && !!errors.location}
+                        helperText={touched.location && errors.location}
+                        sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        fullWidth
+                        variant='filled'
+                        type='number'
+                        label='Quantity'
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.quantity}
+                        name='quantity'
+                        error={!!touched.quantity && !!errors.quantity}
+                        helperText={touched.quantity && errors.quantity}
+                        sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <FormControl sx={{ width: '350px' }}>
+                        <InputLabel>Item Status</InputLabel>
+                        <Select value={values.status} onChange={statusChanger} name='status'>
+                          <MenuItem value={'Missing'}>Missing</MenuItem>
+                          <MenuItem value={'Available'}>Available</MenuItem>
+                          <MenuItem value={'Out of stock'}>Out of stock</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </Box>
-              <Box m='5px' marginTop='40px'>
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <TextField
-                      fullWidth
-                      variant='filled'
-                      type='text'
-                      label='Brand Model'
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.brandModel}
-                      name='brandModel'
-                      error={!!touched.brandModel && !!errors.brandModel}
-                      helperText={touched.brandModel && errors.brandModel}
-                      sx={{ width: '350px', "& .MuiInputBase-root": { color: 'white' } }}
-                    />
+                </Box>
+                <Box m='5px' marginTop='40px'>
+                  <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
+                    <Grid item>
+                      <Button variant='contained' component='label' startIcon={<CloudUpload />} sx={{ marginLeft: '20px', background: 'yellow', color: 'black' }}>
+                        Upload item photo
+                        <input style={{ display: 'none' }} type='file' accept='image/' onChange={imageChanger} id='imageinput' />
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button variant='contained' component='label' startIcon={<CloudUpload />} sx={{ marginLeft: '20px', background: 'yellow', color: 'black' }}>
+                        Upload receipt photo
+                        <input style={{ display: 'none' }} type='file' accept='image/' onChange={receiptChanger} id='receiptImage' />
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button startIcon={<UploadFile />} type='submit' variant='contained' sx={{ background: 'yellow', color: 'black' }}>
+                        Upload data to Database
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button variant='contained' startIcon={<ArrowBackIcon />} onClick={handleBackClick}>
+                        Back
+                      </Button>
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                    <TextField
-                      fullWidth
-                      variant='filled'
-                      type='text'
-                      label='General Specifications'
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.genSpecs}
-                      name='genSpecs'
-                      error={!!touched.genSpecs && !!errors.genSpecs}
-                      helperText={touched.genSpecs && errors.genSpecs}
-                      sx={{ width: '350px', "& .MuiInputBase-root": { color: 'white' } }}
+
+                  <a href={itemImage} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={itemImage}
+                      alt='itemImage'
+                      height='200px'
+                      width='200px'
+                      style={{ margin: "20px", cursor: 'pointer' }}
                     />
-                  </Grid>
-                </Grid>
-              </Box>
-              <Box m='5px' marginTop='40px'>
-                <Grid>
-                  <TextField
-                    fullWidth
-                    variant='filled'
-                    type='text'
-                    label='Location'
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.location}
-                    name='location'
-                    error={!!touched.location && !!errors.location}
-                    helperText={touched.location && errors.location}
-                    sx={{ width: '300px', "& .MuiInputBase-root": { color: 'white' } }}
-                  />                    
-                  <Button variant='contained' component='label' startIcon={<CloudUpload />} sx={{ marginLeft: '20px', background: 'brown' }}>
-                    Upload item photo
-                    <input style={{ display: 'none' }} type='file' accept='image/' onChange={imageChanger} id='imageinput' />
-                  </Button>
-                  <Button variant='contained' component='label' startIcon={<CloudUpload />} sx={{ marginLeft: '20px', background: 'brown', marginTop: '20px' }}>
-                    Upload receipt photo
-                    <input style={{ display: 'none' }} type='file' accept='image/' onChange={receiptChanger} id='receiptImage' />
-                  </Button>
-                </Grid>
-              </Box>
-              <Box marginTop='20px' marginLeft='5px' justifyContent='center' alignSelf='center' display='flex'>
-                <Button startIcon={<UploadFile />} type='submit' variant='contained' sx={{ width: '100%', background: 'brown' }}>
-                  Upload data to Database
-                </Button>
-              </Box>
-            </Form>
-          )}
-        </Formik>
-        <Box display='flex' height='75vh' width='50%' marginLeft='20px' sx={{
-          "& .MuiDataGrid-root": { border: "none" },
-          "& .MuiDataGrid-cell": { borderBottom: "none" },
-          "& .name-column--cell": { color: "#303030" },
-          "& .MuiDataGrid-columnHeaders": { backgroundColor: "#ba828c", borderBottom: "none" },
-          "& .MuiDataGrid-virtualScroller": {},
-          "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: "#8c2e40" },
-          "& .MuiButtonBase-root": { color: "white" }
-        }}>
-          <DataGrid 
-            rows={rows} 
-            columns={columns} 
-            slots={{ toolbar: GridToolbar }}
-            rowSelectionModel={selectionModel}
-            onRowSelectionModelChange={(newSelected) => checkSelected(newSelected)}
-          />
-        </Box>
+                  </a>
+                  <a href={receiptImage} target='_blank' rel='noopener noreferrer'>
+                    <img src={receiptImage} alt='receiptImage' height='200px' width='200px' style={{ margin: "20px" }}/>
+                  </a>
+                </Box>
+                <Box marginTop='20px' marginLeft='5px'>
+
+                </Box>
+              </Form>
+            )}
+          </Formik>
+        )}
       </Box>
+
+      <Box display='flex' height='75vh' width='97%' justifyContent='center' alignSelf='center' marginLeft='20px' sx={{
+        "& .MuiDataGrid-root": { border: "none" },
+        "& .MuiDataGrid-cell": { borderBottom: "none" },
+        "& .name-column--cell": { color: "#303030" },
+        "& .MuiDataGrid-topContainer": { backgroundColor: "#8c2e40", borderBottom: "none" },
+        "& .MuiDataGrid-virtualScroller": {},
+        "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: "#8c2e40" },
+        "& .MuiButtonBase-root": { color: "black" }
+      }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          rowSelectionModel={selectionModel}
+          slots={{toolbar: CustomToolbar}}
+          onRowSelectionModelChange={(newSelected) => checkSelected(newSelected)}
+          density='comfortable'
+        />
+      </Box>
+
+      <Modal open={openDetails} onClose={handleDetailsBackClick}>
+        <Box sx={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4
+        }}>
+          <Typography variant="h6" component="h2">
+            Item Details
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>IIC:</strong> {itemDetails.iic}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>Asset Name:</strong> {itemDetails.assetName}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+          <strong>Brand Model:</strong> {itemDetails.brandModel}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>General Specifications:</strong> {itemDetails.genSpecs}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>Location:</strong> {itemDetails.location}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>Quantity:</strong> {itemDetails.quantity}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>Status:</strong> {itemDetails.status}
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+            <Button variant="contained" onClick={handleDetailsBackClick}>Back</Button>
+          </Box>
+        </Box>
+      </Modal>
       <AdminDrawer />
     </Box>
   );
 };
 
 export default AddItem;
+

@@ -1,5 +1,5 @@
-import { AssignmentReturn, CompassCalibration, Dashboard, PlaylistAdd, RequestPage } from '@mui/icons-material';
-import { Avatar, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
+import { AssignmentReturn, CompassCalibration, Dashboard, PlaylistAdd, ReportSharp, RequestPage } from '@mui/icons-material';
+import { Avatar, Box, Button, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -19,14 +19,12 @@ const AdminDrawer = ({user}) => {
         setOpen(false);
     }
     const logoutUser = () => {
-        if(user?.uid){
             signOut(getAuth()).then(()=>{
                 toast.success("You have successfully logged out!");
                 navigate("/")
             })
-        } 
+        
     }
-    
 
   return (
     <Box sx={{height: '100%', position: 'inherit'}}>
@@ -37,7 +35,6 @@ const AdminDrawer = ({user}) => {
             <Drawer anchor='left' open={open} onClose={() => setOpen(false)}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                   
             >
                 <Box sx={{width: 250, height: '100%', background: "#8c2e40"}} role='presentation'>
                         <List sx={{color: 'white'}}>
@@ -46,7 +43,6 @@ const AdminDrawer = ({user}) => {
                                     src='https://image.pngaaa.com/743/6496743-middle.png'
                                     sx={{height: '150px', width: '150px', boxShadow: '20px', m: '20px', marginLeft: '40px'}}
                                     style={{cursor: 'pointer'}}
-                                    onClick={() => logoutUser()}
                                     />
                             <ListItem>
                                 <ListItemButton onClick={() => navigate('/adminDash')}>
@@ -61,7 +57,7 @@ const AdminDrawer = ({user}) => {
                                     <ListItemIcon sx={{color: 'white'}}>
                                         <PlaylistAdd/>
                                     </ListItemIcon>
-                                    <ListItemText primary='Add Item'/>
+                                    <ListItemText primary='Inventory List'/>
                                 </ListItemButton>
                             </ListItem>
                             <ListItem>
@@ -69,7 +65,7 @@ const AdminDrawer = ({user}) => {
                                     <ListItemIcon sx={{color: 'white'}}>
                                         <CompassCalibration/>
                                     </ListItemIcon>
-                                    <ListItemText primary='Calibrate Items'/>
+                                    <ListItemText primary='Calibration List'/>
                                 </ListItemButton>
                             </ListItem>
                             <ListItem>
@@ -89,6 +85,14 @@ const AdminDrawer = ({user}) => {
                                 </ListItemButton>
                             </ListItem>
                             <ListItem>
+                                <ListItemButton onClick={() => navigate('/reports')}>
+                                    <ListItemIcon sx={{color: 'white'}}>
+                                        <ReportSharp/>
+                                    </ListItemIcon>
+                                    <ListItemText primary='Report Generation'/>
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem>
                                 <ListItemButton onClick={() => navigate('/accountManagement')}>
                                     <ListItemIcon sx={{color: 'white'}}>
                                         <GroupAddIcon/>
@@ -97,8 +101,17 @@ const AdminDrawer = ({user}) => {
                                 </ListItemButton>
                             </ListItem>
                         </List>
+                        <Box display='flex' justifyContent='center'>
+                    <Button variant='contained' 
+                            sx={{width: '50px', marginTop: '20px', backgroundColor:'yellow', color:'black'}}
+                            onClick={() => logoutUser()}
+                            >Logout</Button>
                 </Box>
+                </Box>
+               
+              
             </Drawer>
+           
         </Box>
 
     </Box>

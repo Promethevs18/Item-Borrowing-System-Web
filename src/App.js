@@ -18,6 +18,8 @@ import Returns from './Pages/Admin/Returns';
 import ClientAccount from './Pages/Client/Client_Account';
 import AccountManagement from './Pages/Admin/AccountManagement';
 import Request from './Pages/Admin/Request';
+import Notif from './Pages/Notif';
+import Reports from './Pages/Admin/Reports'
 
 
 function App() {
@@ -26,15 +28,18 @@ function App() {
 
 
   useEffect(() => {
-      auth.onAuthStateChanged((authUser) => {
-        if(authUser){
-          setUser(authUser)
-        }
-        else{
-          setUser(null)
-        }
-      })
-  })
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        setUser(authUser);
+      } else {
+        setUser(null);
+      }
+    });
+  
+
+    return () => unsubscribe();
+  }, []); 
+  
 
   return (
 
@@ -45,8 +50,9 @@ function App() {
 
       <CssBaseline/>
       <ToastContainer position='top-center' theme='colored' autoClose={3000}/>
+      <Notif/>
       <Routes>
-        <Route path="/" element={<Authenticate />} />
+        <Route path="/" element={<Authenticate user={user} />} />
         
         
         <Route path="/adminDash" element={<AdminDash user={user}/>}/>
@@ -55,6 +61,7 @@ function App() {
         <Route path='/returns' element={<Returns user={user}/>}/>
         <Route path="/accountManagement" element={<AccountManagement user={user}/>}/>
         <Route path='/requests' element={<Request user={user}/>}/>
+        <Route path='/reports' element={<Reports user={user}/>}/>
 
 
         <Route path="/clientDash" element={<ClientDash user={user}/>}/>

@@ -13,7 +13,7 @@ body,
   min-height: 100vh;
   display: flex;
   position: relative;
-  background-color: #a46517;
+  background-color: #ffffff;
 }
 
 ::-webkit-scrollbar {

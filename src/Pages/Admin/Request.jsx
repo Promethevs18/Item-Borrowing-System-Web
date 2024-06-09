@@ -1,50 +1,49 @@
-import { Box, CircularProgress } from '@mui/material';
-import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react'
+import { Box, Button, CircularProgress } from '@mui/material';
+import { collection, deleteDoc, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import Header from '../Header';
 import AdminDrawer from './AdminDrawer';
-import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid';
-import Check from '@mui/icons-material/Check';
-import { Clear } from '@mui/icons-material';
+import { DataGrid } from '@mui/x-data-grid';
 import QRCode from 'qrcode';
 import emailjs from '@emailjs/browser';
 import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 
 const Request = () => {
-
     const [requests, setRequests] = useState([]);
     const [openLoad, setOpenLoad] = useState(false);
-  
 
     const db = getFirestore();
     const storage = getStorage();
 
     const columns = [
-        {field: 'borrower', headerName:'Borrower', flex: 1},
-        {field: 'date', headerName:'Date requested', flex: 1},
-        {field: 'email', headerName:'Borrower email', flex: 1},
-        {field: 'tools', headerName:'Tools requested', flex: 1},
-        {field: 'actions', type: 'actions', headerName: "Action", flex: 1, getActions: (params) => [
-            <GridActionsCellItem
-                icon={<Check/>}
-                label='Accept'
-                onClick={() => approve(params.row)}
-            />,
-            <GridActionsCellItem
-                icon={<Clear/>}
-                label = 'Deny'
-                onClick={() => {denied(params.row)}}
-                
-            />
-    ]}
-    ]
+        { field: 'transactionCode', headerName: 'Transaction Code', flex: 1 },
+        { field: 'borrower', headerName: 'Borrower', flex: 1 },
+        { field: 'date', headerName: 'Date requested', flex: 1 },
+        { field: 'tools', headerName: 'Tools requested', flex: 1 },
+        { field: 'actions', type: 'actions', headerName: 'Action', flex: 1, getActions: (params) => [
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => approve(params.row.id, params.row)}>
+                Approved
+            </Button>,
+            <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => { denied(params.row.id, params.row) }}>
+                Denied
+            </Button>
+        ] }
+    ];
 
     useEffect(() => {
         const getData = async () => {
             try {
                 const querySnapshot = await getDocs(collection(db, "Requests"));
                 const data = querySnapshot.docs.map((doc) => ({
-                    id: doc.id, ...doc.data()
+                    id: doc.id,
+                    transactionCode: doc.id,
+                    ...doc.data()
                 }));
                 setRequests(data);
             } catch (error) {
@@ -76,18 +75,20 @@ const Request = () => {
         }
     };
 
-    const approve = async (values) => {
+    const approve = async (docId, values) => {
         setOpenLoad(true);
         try {
-            const qrRoute = await generateQRCode(values.borrower);
+            const qrRoute = await generateQRCode(docId);
             const qrDownloadUrl = await uploadQRCode(qrRoute);
             if (qrDownloadUrl) {
                 const emailTemplate = {
                     ...values,
+                    transaction_code: docId,
                     qr_code: qrDownloadUrl
                 };
-                await setDoc(doc(db, "Approved Requests", values.borrower), {
-                    ...values
+                await setDoc(doc(db, "Approved Requests", docId), {
+                    ...values,
+                    transaction_code: docId,
                 });
                 await emailjs.send("service_t1pnh7h", "template_caoc6rw", emailTemplate, "w6M46-gvrb52cc9Sz");
                 console.log("Email sent successfully");
@@ -99,13 +100,26 @@ const Request = () => {
         }
     };
 
-    const denied = () => {
-        // Handle deny action
+    const denied = async (docId, values) => {
+        setOpenLoad(true);
+        try {
+                await deleteDoc(doc(db, "Requests", docId));
+                setRequests(requests.filter(request => request.id !== docId));
+
+                await setDoc(doc(db, "Rejected Requests", docId), {
+                    ...values,
+                    transaction_code: docId,
+                });
+            
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            setOpenLoad(false);
+        }
     };
 
     return (
         <Box m='20px'>
-
             {openLoad && (
                 <CircularProgress
                     sx={{
@@ -129,15 +143,12 @@ const Request = () => {
                 "& .MuiDataGrid-columnHeaders": { backgroundColor: "#ba828c", borderBottom: "none" },
                 "& .MuiDataGrid-virtualScroller": {},
                 "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: "#8c2e40" },
-                "& .MuiButtonBase-root": { color: "white" },
-                "& .MuiDataGrid-virtualScrollerRenderZone": {
-                    color: 'white'
-                }
+                "& .MuiButtonBase-root": { color: "black" },
+                "& .MuiDataGrid-virtualScrollerRenderZone": { color: 'black' }
             }}>
                 <DataGrid
                     rows={requests}
                     columns={columns}
-                    slots={{ toolbar: GridToolbar }}
                 />
             </Box>
 

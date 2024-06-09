@@ -15,7 +15,7 @@ const Admin_Dash = ({user}) => {
         />
       <Box display='flex' justifyContent='center'>
          {/* This is for the title and image */}
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box display="flex" justifyContent="center" alignItems="center" marginTop='50px'>
         <div>
           <Typography
             textAlign="center"
@@ -23,18 +23,18 @@ const Admin_Dash = ({user}) => {
             alignContent="center"
             variant="h1"
             fontWeight="bold"
-            color="white"
+            color="black"
           >
-           Philosophy
+          A Cloud Based Laboratory Inventory Management System Using Web and Mobile Application with QR Code Integration. 
           </Typography>
           <Box
             display="flow"
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant='h2' color='white' textAlign='center'
+            <Typography variant='h2' color='black' textAlign='center'
               fontSize='30px' marginLeft="50px" marginRight='50px' marginTop='20px'
-            >The University of Perpetual Help System DALTA believes and invokes Divine Guidance in the betterment of the quality of life through national development and transformation, which are predicated upon the quality of education of its people. Towards this end, the Institution is committed to the ideals of teaching, community service, and research as it nurtures the value of “Helpers of God”, with “Character Building is Nation Building” as its guiding principle.</Typography>
+            >Focusing on security and user accessibility, the system offers a secured user registration process with varying access levels tailored for laboratory management on both mobile and web platforms. It boasts a robust database that houses equipment inventory, user information, and transaction records, all stored in the cloud with automated QR code generation. Additionally, the system includes a feature for generating standardized reports that ensures data confidentiality and integrity by preventing unauthorized alterations to the reports stored in the cloud-based database..</Typography>
           </Box>
 
             <Box  justifyContent='center'
@@ -87,19 +87,18 @@ const Admin_Dash = ({user}) => {
            <Box display="flex" justifyContent="space-evenly" alignContent="center">
         <div style={{ padding: "20px" }}>
           <span>
-            <Typography fontWeight="bold" variant="h2" color="white"   display='flex'
+            <Typography fontWeight="bold" variant="h2" color="black"   display='flex'
               justifyContent='center'>
-              Mission
+           
             </Typography>
             <Typography
               variant="h5"
-              color="white"
+              color="black"
               marginTop="10px"
               alignContent="center"
               sx={{ width: "400px" }}
             >
-             The UNIVERSITY OF PERPETUAL HELP SYSTEM DALTA is dedicated to the development of the Filipino as a leader. It aims to graduate dynamic students who are physically, intellectually, socially and spiritually committed to the achievement of the highest quality of life.
-
+          
             </Typography>
           </span>
         </div>
@@ -107,26 +106,22 @@ const Admin_Dash = ({user}) => {
           <span>
             <Typography
               variant="h2"
-              color="white"
+              color="black"
               alignItems="center"
               display='flex'
               justifyContent='center'
               fontWeight='bold'
             >
-              Vision
+            
             </Typography>
             <Typography
               variant="h5"
-              color="white"
+              color="black"
               marginTop="10px"
               alignContent="space-evenly"
               sx={{ width: "600px", justifyContent: 'center' }}
             >
-              The University of Perpetual Help System DALTA shall emerge as a premier university in the Philippines. It shall provide a venue for the pursuit of excellence in academics, technology, and research through community partnership.
-
-The University shall take the role of a catalyst for human development. It shall inculcate Christian values – Catholic in doctrine as a way of strengthening the moral fiber of the Filipino – a people who are “Helpers of God”, proud of their race and prepared for the exemplary global participation in the arts, sciences, humanities, and business.
-
-It foresees the Filipino people enjoying a quality of life in abundance, living in peace, and building a nation that the next generation will nourish, cherish, and value.
+    
             </Typography>
           </span>
         </div>
