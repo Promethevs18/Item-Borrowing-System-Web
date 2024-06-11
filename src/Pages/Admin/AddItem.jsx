@@ -62,7 +62,7 @@ const AddItem = ({ user }) => {
         ...values,
         itemImage: itemImage,
         receiptImage: receiptImage,
-        ItemStatus: status
+        ItemExistence: status,
       });
       setOpenLoad(false);
       toast.success("Data uploaded successfully!");
@@ -183,13 +183,13 @@ const AddItem = ({ user }) => {
     { field: 'genSpecs', headerName: 'General Specifications', flex: 1 },
     { field: 'location', headerName: 'Location', flex: 1 },
     { field: 'quantity', headerName: 'Quantity', flex: 1 }, // Add quantity column
-    { field: 'status', headerName: 'Status', flex: 1 }, // Add status column
+    { field: 'ItemExistence', headerName: 'Status', flex: 1 }, // Add status column
     { 
       field: 'qrCode', 
       headerName: 'QR Code', 
       flex: 1,
       renderCell: (params) => (
-        <QRCode value={params.row.iic} style={{ width: '60px', height: '60px' }}/>
+        <QRCode value={`Item: ${params.row.assetName}`} style={{ width: '60px', height: '60px' }}/>
       )
     },
     { field: 'actions', type: 'actions', headerName: 'Action', flex: 1, getActions: (params) => [

@@ -11,6 +11,7 @@ import AdminDrawer from './AdminDrawer'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import CustomToolBar from '../CustomToolBar'
 
 const Calibration = () => {
 
@@ -355,6 +356,7 @@ const Calibration = () => {
                         rows={dataRows}
                         editMode="row"
                         rowSelectionModel={selectionModel}
+                        slots={{toolbar: CustomToolBar}}
                         onRowSelectionModelChange={(newSelected) => checkSelected(newSelected)}
                         sx={{
                             '@media print': {

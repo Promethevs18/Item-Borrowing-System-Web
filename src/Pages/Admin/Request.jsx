@@ -20,7 +20,7 @@ const Request = () => {
         { field: 'transactionCode', headerName: 'Transaction Code', flex: 1 },
         { field: 'borrower', headerName: 'Borrower', flex: 1 },
         { field: 'date', headerName: 'Date requested', flex: 1 },
-        { field: 'tools', headerName: 'Tools requested', flex: 1 },
+        { field: 'assetName', headerName: 'Tool requested', flex: 1 },
         { field: 'actions', type: 'actions', headerName: 'Action', flex: 1, getActions: (params) => [
             <Button
                 variant="contained"

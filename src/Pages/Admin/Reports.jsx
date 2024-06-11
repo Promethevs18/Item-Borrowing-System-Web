@@ -66,7 +66,54 @@ const Reports = () => {
   }, [reportType]);
 
   const generatePDF = async () => {
-    // PDF generation logic
+    const doc = new jsPDF();
+  
+    // Add logo
+    const logoUrl = '/perpetual-logo.png';
+    const imgWidth = 50;
+    const imgHeight = 15;
+  
+    try {
+      await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = logoUrl;
+        img.onload = () => {
+          doc.addImage(img, 'PNG', 10, 10, imgWidth, imgHeight);
+          resolve();
+        };
+        img.onerror = (error) => {
+          console.error('Error loading image:', error);
+          reject(error);
+        };
+      });
+    } catch (error) {
+      console.error('Error adding logo to PDF:', error);
+    }
+  
+    // Add header
+    doc.setFontSize(16);
+    doc.setTextColor(128, 0, 0); // Maroon color
+    doc.text("Item Borrowing System", 105, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0); // Black color
+    doc.text("Report Type: " + reportType.toUpperCase(), 105, 30, { align: 'center' });
+  
+    // Add DataGrid
+    doc.autoTable({
+      head: [columns.map((col) => col.headerName)],
+      body: rows.map((row) => columns.map((col) => row[col.field])),
+      startY: 40, // Position of DataGrid below logo and header
+      theme: 'grid',
+      styles: {
+        headerFill: [128, 0, 0], // Maroon color for header background
+        textColor: [255, 255, 255], // White color for header text
+        alternateRowFill: [245, 245, 220], // Yellow color for alternate rows
+      },
+      bodyStyles: { textColor: [0, 0, 0] } // Black color for body text
+    });
+  
+    // Save PDF
+    doc.save(`${reportType}_report.pdf`);
   };
 
   return (

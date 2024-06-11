@@ -25,7 +25,7 @@ const BorrowItem = ({ user }) => {
     const getData = async () => {
       const itemsQuery = query(
         collection(database, "Items"),
-        where("ItemStatus", "!=", "borrowed")
+        where("ItemExistence", "!=", "borrowed")
       );
 
       const queryData = await getDocs(itemsQuery);
