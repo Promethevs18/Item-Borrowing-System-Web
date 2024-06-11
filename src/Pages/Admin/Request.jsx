@@ -7,6 +7,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import QRCode from 'qrcode';
 import emailjs from '@emailjs/browser';
 import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { toast } from 'react-toastify';
 
 const Request = () => {
     const [requests, setRequests] = useState([]);
@@ -24,13 +25,13 @@ const Request = () => {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => approve(params.row.id, params.row)}>
+                onClick={() => approve(params.row.transactionCode, params.row)}>
                 Approved
             </Button>,
             <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => { denied(params.row.id, params.row) }}>
+                onClick={() => { denied(params.row.transactionCode, params.row) }}>
                 Denied
             </Button>
         ] }
@@ -91,7 +92,7 @@ const Request = () => {
                     transaction_code: docId,
                 });
                 await emailjs.send("service_t1pnh7h", "template_caoc6rw", emailTemplate, "w6M46-gvrb52cc9Sz");
-                console.log("Email sent successfully");
+                toast.success("Email sent successfully");
                 setOpenLoad(false);
             }
         } catch (error) {
@@ -103,13 +104,15 @@ const Request = () => {
     const denied = async (docId, values) => {
         setOpenLoad(true);
         try {
-                await deleteDoc(doc(db, "Requests", docId));
-                setRequests(requests.filter(request => request.id !== docId));
-
-                await setDoc(doc(db, "Rejected Requests", docId), {
+               await setDoc(doc(db, "Rejected Requests", docId), {
                     ...values,
                     transaction_code: docId,
+                }).then(() => {
+                    deleteDoc(doc(db, "Requests", docId));
+                    setRequests(requests.filter(request => request.id !== docId));
                 });
+
+                toast.success("Request Rejected")
             
         } catch (error) {
             console.error("Error:", error);

@@ -20,6 +20,7 @@ import AccountManagement from './Pages/Admin/AccountManagement';
 import Request from './Pages/Admin/Request';
 import Notif from './Pages/Notif';
 import Reports from './Pages/Admin/Reports'
+import BorrowItem from './Pages/Client/BorrowItem';
 
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
 
         <Route path="/clientDash" element={<ClientDash user={user}/>}/>
         <Route path="/clientAccount" element={<ClientAccount user={user}/>}/>
+        <Route path="/borrow" element={<BorrowItem user={user}/>}/>
       </Routes>
       </main>
     </div>

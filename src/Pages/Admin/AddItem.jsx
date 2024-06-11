@@ -338,7 +338,7 @@ const AddItem = ({ user }) => {
                     <Grid item>
                       <FormControl sx={{ width: '350px' }}>
                         <InputLabel>Item Status</InputLabel>
-                        <Select value={values.status} onChange={statusChanger} name='status'>
+                        <Select value={status} onChange={statusChanger} name='status'>
                           <MenuItem value={'Missing'}>Missing</MenuItem>
                           <MenuItem value={'Available'}>Available</MenuItem>
                           <MenuItem value={'Out of stock'}>Out of stock</MenuItem>
@@ -441,6 +441,12 @@ const AddItem = ({ user }) => {
           </Typography>
           <Typography sx={{ mt: 2 }}>
             <strong>Status:</strong> {itemDetails.status}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>Item Image:</strong> <img src={itemDetails.itemImage} alt="Item Image" style={{ height: '100px', width: '100px' }} />
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>Receipt Image:</strong> <img src={itemDetails.receiptImage} alt="Receipt Image" style={{ height: '100px', width: '100px' }} />
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
             <Button variant="contained" onClick={handleDetailsBackClick}>Back</Button>

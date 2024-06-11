@@ -1,149 +1,139 @@
-import { Box, Button } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import Header from '../Header';
-import { DataGrid } from '@mui/x-data-grid';
-import ClientDrawer from './ClientDrawer';
-import { collection, getDocs, getFirestore, query, where, addDoc, doc, updateDoc } from 'firebase/firestore';
-import { toast } from 'react-toastify';
+import { Box, Typography } from '@mui/material'
+import React from 'react'
+import { Card, CardCover } from '@mui/joy'
+import ClientDrawer from './ClientDrawer'
 
-const Client_Dash = ({ user }) => {
-  const database = getFirestore();
 
-  const [dataRows, setDataRows] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-  
-  const dataColumns = [
-    { field: "iic", headerName: "IIC Number", flex: 1 },
-    { field: "assetName", headerName: "Asset Name", flex: 1 },
-    { field: "brandModel", headerName: "Brand Model", flex: 1 },
-    { field: "genSpecs", headerName: "General Specifications", flex: 1 },
-    { field: "location", headerName: "Item Location", flex: 1 },
-  ];
-
-  useEffect(() => {
-    const getData = async () => {
-      const itemsQuery = query(
-        collection(database, "Items"),
-        where("ItemStatus", "!=", "borrowed")
-      );
-
-      const queryData = await getDocs(itemsQuery);
-      const data = queryData.docs.map((mapa) => ({
-        id: mapa.id, ...mapa.data()
-      }));
-      setDataRows(data);
-    };
-
-    getData();
-  }, [database]); // Added dependency array to ensure the effect runs only once
-
-  const handleSelectionChange = (newSelectionModel) => {
-    setSelectedRows(newSelectionModel);
-  };
-
-  const borrowItem = async () => {
-    const userDisplayName = user.displayName || 'Unknown User';
-    const userEmail = user.email || 'unknown@example.com';
-    const userPhotoURL = user.photoURL || '';
-    const requestDate = new Date().toISOString(); // Current date in ISO format
-
-    try {
-      for (let itemId of selectedRows) {
-        // Get the item details from dataRows
-        const itemDetails = dataRows.find(item => item.id === itemId);
-        if (itemDetails) {
-          // Add to Requests collection with a random ID
-          await addDoc(collection(database, "Requests"), {
-            borrower: userDisplayName,
-            email: userEmail,
-            profileImage: userPhotoURL,
-            date: requestDate,
-            ...itemDetails
-          });
-
-          // Update ItemStatus in Items collection
-          const itemDocRef = doc(database, "Items", itemId);
-          await updateDoc(itemDocRef, { ItemStatus: "borrowed" });
-        }
-      }
-      toast.info("Items successfully borrowed!");
-    } catch (error) {
-      console.error("Error borrowing items: ", error);
-      toast.error("Error borrowing items. Please try again.");
-    }
-  };
+const Client_Dash = ({user}) => {
 
   return (
-    <Box>
-      <Header title="Client Dashboard" description="These are the items available to borrow" />
 
-      <Box m='20px' display='flex' justifyContent='center'>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignContent="center"
-          height="70vh"
-          width="95%"
-          sx={{
-            "& .MuiDataGrid-root": {
-              border: "none",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: "none",
-            },
-            "& .name-column--cell": {
-              color: 'white',
-            },
-            "& .MuiDataGrid-topContainer": {
-              background: 'maroon',
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-virtualScroller": {
-              backgroundColor: '#8c2e40',
-            },
-            "& .MuiDataGrid-footerContainer": {
-              borderTop: "none",
-              backgroundColor: 'maroon',
-            },
-            "& .MuiButtonBase-root": {
-              color: 'wheat'
-            }
-          }}
-        >
-          <DataGrid
-            columns={dataColumns}
-            rows={dataRows}
-            checkboxSelection
-            keepNonExistentRowsSelected
-            onRowSelectionModelChange={(newSelection) => handleSelectionChange(newSelection)}
-            sx={{
-              '@media print': {
-                '.MuiDataGrid-main': { color: 'rgba(0, 0, 0, 0.87)' },
-              },
-              '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
-                backgroundColor: "maroon",
-                color: "white",
-                fontWeight: 700,
-              },
-              '& .MuiTablePagination-root': {
-                color: "white",
-                fontWeight: 700,
-              },
-              '& .MuiButtonBase-root': {
-                color: "white",
-                fontWeight: 700,
-              }
-            }}
-          />
-        </Box>
-      </Box>
-      <Box m='20px' display='flex' justifyContent='center'>
-        <Button variant='contained' onClick={borrowItem}>Borrow Selected Items</Button>
-      </Box>
+    <Box m='20px'>
+        <img 
+        src='https://perpetualdalta.edu.ph/wp-content/uploads/2018/02/perpetual-logo.png'
+        alt=''
+        />
+      <Box display='flex' justifyContent='center'>
+         {/* This is for the title and image */}
+      <Box display="flex" justifyContent="center" alignItems="center" marginTop='50px'>
+        <div>
+          <Typography
+            textAlign="center"
+            fontSize="50px"
+            alignContent="center"
+            variant="h1"
+            fontWeight="bold"
+            color="black"
+          >
+          A Cloud Based Laboratory Inventory Management System Using Web and Mobile Application with QR Code Integration. 
+          </Typography>
+          <Box
+            display="flow"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant='h2' color='black' textAlign='center'
+              fontSize='30px' marginLeft="50px" marginRight='50px' marginTop='20px'
+            >Focusing on security and user accessibility, the system offers a secured user registration process with varying access levels tailored for laboratory management on both mobile and web platforms. It boasts a robust database that houses equipment inventory, user information, and transaction records, all stored in the cloud with automated QR code generation. Additionally, the system includes a feature for generating standardized reports that ensures data confidentiality and integrity by preventing unauthorized alterations to the reports stored in the cloud-based database..</Typography>
+          </Box>
 
-      <ClientDrawer user={user} />
+            <Box  justifyContent='center'
+            sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 0, m: 4 }}>
+  
+            <Card sx={{height: 200, width: 300}}>
+                  <CardCover>
+                  <iframe width="1519" height="566" src="https://www.youtube.com/embed/-kAjQsGA5LQ" title="University of Perpetual Help System DALTA: College of Maritime" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                  </CardCover>
+                  </Card>
+ 
+               <Card sx={{height: 200, width: 300}}>
+                    <CardCover>
+                      <img
+                        src='http://services.perpetualdalta.edu.ph:8345/images/banners/About-Home-Banner-2014.jpg'
+                        loading='lazy'
+                        alt=''
+                      />
+                    </CardCover>
+                  </Card>
+
+                  <Card sx={{height: 200, width: 300}}>
+                    <CardCover>
+                      <img
+                        src='https://edukasyon-production.s3.ap-southeast-1.amazonaws.com/uploads/facility/image/2389/mo-e1518972880388.jpg'
+                        loading='lazy'
+                        alt=''
+                      />
+                    </CardCover>
+                  </Card>
+
+                  <Card sx={{height: 200, width: 300}}>
+                  <CardCover>
+                      <iframe 
+                      width="1519" 
+                      height="566" 
+                      src="https://www.youtube.com/embed/1bSTzwIt-L4" 
+                      title="University of Perpetual Help: Be AHEAD, Achieve the UNIVERSITY EDGE" 
+                      frameborder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                      referrerpolicy="strict-origin-when-cross-origin" 
+                      allowfullscreen></iframe>
+                  </CardCover>
+                  </Card>
+
+            </Box>
+      
+
+           {/* This is for the mission and Vision content */}
+           <Box display="flex" justifyContent="space-evenly" alignContent="center">
+        <div style={{ padding: "20px" }}>
+          <span>
+            <Typography fontWeight="bold" variant="h2" color="black"   display='flex'
+              justifyContent='center'>
+           
+            </Typography>
+            <Typography
+              variant="h5"
+              color="black"
+              marginTop="10px"
+              alignContent="center"
+              sx={{ width: "400px" }}
+            >
+          
+            </Typography>
+          </span>
+        </div>
+        <div style={{ padding: "20px" }}>
+          <span>
+            <Typography
+              variant="h2"
+              color="black"
+              alignItems="center"
+              display='flex'
+              justifyContent='center'
+              fontWeight='bold'
+            >
+            
+            </Typography>
+            <Typography
+              variant="h5"
+              color="black"
+              marginTop="10px"
+              alignContent="space-evenly"
+              sx={{ width: "600px", justifyContent: 'center' }}
+            >
+    
+            </Typography>
+          </span>
+        </div>
+           </Box>
+    
+        </div>
+         
+      </Box>
+      
+      </Box>
+      <ClientDrawer user={user}/>
     </Box>
-  );
+  )
 }
-
-export default Client_Dash;
+export default Client_Dash
