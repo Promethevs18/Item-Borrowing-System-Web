@@ -21,13 +21,13 @@ import Request from './Pages/Admin/Request';
 import Notif from './Pages/Notif';
 import Reports from './Pages/Admin/Reports'
 import BorrowItem from './Pages/Client/BorrowItem';
+import ReturnedItems from './Pages/Client/ReturnedItems'
+import {AuthProvider} from './Pages/AuthContext'
 
 
 function App() {
 
   const [user, setUser] = useState(null);
-
-
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
@@ -44,34 +44,38 @@ function App() {
 
   return (
 
-    <Router>
-    <div className="app">
-      <main className='content'>
+    <AuthProvider>
+      <Router>
+      <div className="app">
+        <main className='content'>
 
 
-      <CssBaseline/>
-      <ToastContainer position='top-center' theme='colored' autoClose={3000}/>
-      <Notif/>
-      <Routes>
-        <Route path="/" element={<Authenticate user={user} />} />
-        
-        
-        <Route path="/adminDash" element={<AdminDash user={user}/>}/>
-        <Route path='/addItem' element={<AddItem user={user}/>}/>
-        <Route path='/calibration' element={<Calibration user={user}/>}/>
-        <Route path='/returns' element={<Returns user={user}/>}/>
-        <Route path="/accountManagement" element={<AccountManagement user={user}/>}/>
-        <Route path='/requests' element={<Request user={user}/>}/>
-        <Route path='/reports' element={<Reports user={user}/>}/>
+        <CssBaseline/>
+        <ToastContainer position='top-center' theme='colored' autoClose={3000}/>
+        <Notif/>
+  
+        <Routes>
+          <Route path="/" element={<Authenticate   />} />
+          
+          
+          <Route path="/adminDash" element={<AdminDash  />}/>
+          <Route path='/addItem' element={<AddItem  />}/>
+          <Route path='/calibration' element={<Calibration  />}/>
+          <Route path='/returns' element={<Returns  />}/>
+          <Route path="/accountManagement" element={<AccountManagement  />}/>
+          <Route path='/requests' element={<Request  />}/>
+          <Route path='/reports' element={<Reports  />}/>
 
 
-        <Route path="/clientDash" element={<ClientDash user={user}/>}/>
-        <Route path="/clientAccount" element={<ClientAccount user={user}/>}/>
-        <Route path="/borrow" element={<BorrowItem user={user}/>}/>
-      </Routes>
-      </main>
-    </div>
-    </Router>
+          <Route path="/clientDash" element={<ClientDash  />}/>
+          <Route path="/clientAccount" element={<ClientAccount  />}/>
+          <Route path="/borrow" element={<BorrowItem  />}/>
+          <Route path='/returned' element={<ReturnedItems  />}/>
+        </Routes>
+        </main>
+      </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

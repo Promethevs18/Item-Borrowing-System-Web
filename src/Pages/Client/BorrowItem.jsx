@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../Header';
 import { DataGrid } from '@mui/x-data-grid';
 import ClientDrawer from './ClientDrawer';
-import { collection, getDocs, getFirestore, query, where, addDoc, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, getFirestore, query, where, addDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import CustomGridToolbar from '../CustomToolBar';
 
@@ -30,7 +30,8 @@ const BorrowItem = ({ user }) => {
 
       const queryData = await getDocs(itemsQuery);
       const data = queryData.docs.map((mapa) => ({
-        id: mapa.id, ...mapa.data()
+        id: mapa.id,
+       ...mapa.data()
       }));
       setDataRows(data);
     };
@@ -55,27 +56,36 @@ const BorrowItem = ({ user }) => {
       let transactionNumber = 1; // Default value if counter document doesn't exist
   
       if (counterDoc.exists()) {
-        transactionNumber= counterDoc.data().value
+        transactionNumber = counterDoc.data().value;
       }
   
       // Borrow selected items
       for (let itemId of selectedRows) {
         // Get the item details from dataRows
-        const itemDetails = dataRows.find(item => item.id === itemId);
+        const itemDetails = dataRows.find((item) => item.id === itemId);
         if (itemDetails) {
+          // Generate transaction code
+          const transactionCode = `2024-${padWithZeros(transactionNumber, 5)}`;
+  
           // Add to Requests collection with the transaction number
-          await setDoc(doc(database, `Requests`, `${userDisplayName}-${transactionNumber}`), {
-            transactionNumber: transactionNumber,
+          await addDoc(collection(database, `Requests`), {
+            transactionCode: transactionCode,
+            tools: itemDetails.assetName,
             borrower: userDisplayName,
             email: userEmail,
             profileImage: userPhotoURL,
             date: requestDate,
-            ...itemDetails
+            iic: itemDetails.iic,
+            assetName: itemDetails.assetName,
+            brandModel: itemDetails.brandModel,
+            genSpecs: itemDetails.genSpecs,
+            location: itemDetails.location
+           
           });
   
           // Update ItemStatus in Items collection
           const itemDocRef = doc(database, "Items", itemId);
-          await updateDoc(itemDocRef, { ItemStatus: "borrowed" });
+          await updateDoc(itemDocRef, { ItemExistence: "borrowed" });
         }
       }
   
@@ -88,6 +98,16 @@ const BorrowItem = ({ user }) => {
       toast.error("Error borrowing items. Please try again.");
     }
   };
+  
+  // Function to pad a number with zeros to ensure it has a certain length
+  const padWithZeros = (number, length) => {
+    let result = number.toString();
+    while (result.length < length) {
+      result = "0" + result;
+    }
+    return result;
+  };
+  
   
 
   return (

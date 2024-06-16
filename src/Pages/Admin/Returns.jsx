@@ -7,7 +7,7 @@ import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid'
 import { Check } from '@mui/icons-material'
 import { toast } from 'react-toastify'
 
-const Inventory = () => {
+const Inventory = ({user}) => {
 
   const database = getFirestore();
 
@@ -52,25 +52,34 @@ const Inventory = () => {
     { field: "transactionCode", headerName: "Transaction Code", flex: 1 },
     { field: "borrower", headerName: "Borrower's name", flex: 1 },
     { field: "date", headerName: "Date Requested", flex: 1 },
+    { field: "iic", headerName: "IIC", flex: 1 },
     { field: "tools", headerName: "Tools borrowed", flex: 1 },
-    { field: 'actions', type: 'actions', headerName: "Action", flex: 1, getActions: (params) => [
-      <GridActionsCellItem
-        icon={<Check />}
-        label="Accept"
-        onClick={() => returned(params.row)}
-      />
-    ]}
+    { field: 'actions', type: 'actions', headerName: "Action", flex: 1, getActions: (params) => {
+      const actions = []
+      if(user?.uid === 'rt5MKdHOWyZaAS3h5LtdsnLWXae2'){
+        actions.push(
+          <GridActionsCellItem
+            icon={<Check />}
+            label="Accept"
+            onClick={() => returned(params.row)}
+          />
+        )
+      }
+     return actions
+    }}
   ];
 
   const returnedCols = [
     { field: "transactionCode", headerName: "Transaction Code", flex: 1 },
     { field: "borrower", headerName: "Borrower's name", flex: 1 },
     { field: "date", headerName: "Date Requested", flex: 1 },
+    { field: "iic", headerName: "IIC", flex: 1 },
     { field: "tools", headerName: "Tools borrowed", flex: 1 },
     { field: "returnedDate", headerName: "Date Returned", flex: 1 }
   ];
 
   const returned = async (data) => {
+    toast.info(data.id)
     setOpenLoad(true);
     try {
       await setDoc(doc(database, "Returned Items", data.id), {

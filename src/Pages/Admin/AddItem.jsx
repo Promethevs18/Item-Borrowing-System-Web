@@ -33,6 +33,7 @@ const AddItem = ({ user }) => {
   const [itemDetails, setItemDetails] = useState({});
   const formikRef = useRef(null);
   const [status, setStatus] = useState('');
+  
 
   const initialValues = {
     iic: '',
@@ -227,9 +228,10 @@ const AddItem = ({ user }) => {
       )}
       <Header title='Inventory List' description='Create a new item/material that is ready for students/teachers to borrow' />
       <Box m='20px' justifyContent='space-around' alignSelf='center' display='flex' marginTop='100px'>
-        {!showForm && (
-          <Button variant="contained" onClick={handleButtonClick}>Add New Item</Button>
+        {user?.uid === 'rt5MKdHOWyZaAS3h5LtdsnLWXae2' && !showForm && (
+            <Button variant="contained" onClick={handleButtonClick}>Add New Item</Button>
         )}
+       
         {showForm && (
           <Formik
             initialValues={initialValues}
@@ -419,7 +421,7 @@ const AddItem = ({ user }) => {
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4
         }}>
           <Typography variant="h6" component="h2">
-            Item Details
+            Item Details {itemDetails.iic}
           </Typography>
           <Typography sx={{ mt: 2 }}>
             <strong>IIC:</strong> {itemDetails.iic}
@@ -443,10 +445,14 @@ const AddItem = ({ user }) => {
             <strong>Status:</strong> {itemDetails.status}
           </Typography>
           <Typography sx={{ mt: 2 }}>
-            <strong>Item Image:</strong> <img src={itemDetails.itemImage} alt="Item Image" style={{ height: '100px', width: '100px' }} />
+            <strong>Item Image:</strong> <img src={itemDetails.itemImage}  style={{ height: '100px', width: '100px' }} />
           </Typography>
           <Typography sx={{ mt: 2 }}>
-            <strong>Receipt Image:</strong> <img src={itemDetails.receiptImage} alt="Receipt Image" style={{ height: '100px', width: '100px' }} />
+            <strong>Receipt Image:</strong> <img src={itemDetails.receiptImage}  style={{ height: '100px', width: '100px' }} />
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            <strong>QR Code:</strong>
+                <QRCode value={`Item: ${itemDetails.iic}`} size={100}/>
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
             <Button variant="contained" onClick={handleDetailsBackClick}>Back</Button>

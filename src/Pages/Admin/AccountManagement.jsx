@@ -2,7 +2,7 @@ import { Avatar, Box, Button, Card, CardContent, CircularProgress, FormControl, 
 import React, { useEffect, useRef, useState } from 'react'
 import AdminDrawer from './AdminDrawer'
 import Header from '../Header'
-import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import * as yup from 'yup'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
@@ -32,6 +32,7 @@ const AccountManagement = () => {
     const [status, setStatus] = useState('')
     const [desc, setDesc] = useState('Deactivated')
     const [accountLevel, setAccountLevel] = useState([])
+    const [selectionModel, setSelectionModel] = useState([])
 
     const [selectedCategory, setCategory] = useState('')
     const categoryChange = (event) => {
@@ -65,6 +66,35 @@ const AccountManagement = () => {
       setStatus(event.target.checked ? "Activated" : "Deactivated")
     }
 
+    const checkSelected = async (items) => {
+      const selectedID = items[0];
+      setSelectionModel(items)
+      setOpenLoad(true);
+      try {
+          const takeItems = doc(db, `Users list/${selectedID}`);
+          const snap = await getDoc(takeItems);
+
+          if (snap.exists()) {
+              const updatedIni = snap.data();
+              innerRef.current.setValues(updatedIni);
+              setOpenLoad(false)
+          }
+      }
+      catch (error) {
+          setOpenLoad(false);
+          toast.error(`Error occurred due to: ${error}`);
+      }
+  }
+  const updateOnly = async (values) => {
+    await setDoc(doc(db, "Users list", values.fullName), {
+      ...values,
+      profileImage: profileImage,
+      status: status,
+      accountLevel: accountLevel
+    }).then(() => {
+      toast.success("Account updated successfully!")
+    });
+  }
     const signInToSystem  = async (values) => {
       setOpenLoad(true);
         try{
@@ -235,6 +265,9 @@ const AccountManagement = () => {
                                       <Button type='submit' color='secondary' variant='contained'>
                                           Add account to system
                                       </Button>
+                                      <Button sx={{marginLeft: "20px"}} onClick={() => updateOnly(values)} color='secondary' variant='contained'>
+                                          Update Data
+                                      </Button>
                                     </Box>
                                   </Box>
                             </Form>
@@ -250,8 +283,10 @@ const AccountManagement = () => {
                 <DataGrid
                   columns={dataColumn}
                   rows={accountList}
+                  rowSelectionModel={selectionModel}
                   editMode="row"
                   slots={{ toolbar: CustomToolBar }}
+                  onRowSelectionModelChange={(newSelected) => checkSelected(newSelected)}
                   sx={{
                     "& .MuiDataGrid-root": {
                       border: "none",

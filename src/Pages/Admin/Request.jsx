@@ -20,18 +20,19 @@ const Request = () => {
         { field: 'transactionCode', headerName: 'Transaction Code', flex: 1 },
         { field: 'borrower', headerName: 'Borrower', flex: 1 },
         { field: 'date', headerName: 'Date requested', flex: 1 },
-        { field: 'assetName', headerName: 'Tool requested', flex: 1 },
+        { field: 'tools', headerName: 'Tool requested', flex: 1 },
+        { field: 'iic', headerName: 'IIC', flex: 1 },
         { field: 'actions', type: 'actions', headerName: 'Action', flex: 1, getActions: (params) => [
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => approve(params.row.transactionCode, params.row)}>
+                onClick={() => approve(params.row.id, params.row)}>
                 Approved
             </Button>,
             <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => { denied(params.row.transactionCode, params.row) }}>
+                onClick={() => { denied(params.row.id, params.row) }}>
                 Denied
             </Button>
         ] }
@@ -43,9 +44,9 @@ const Request = () => {
                 const querySnapshot = await getDocs(collection(db, "Requests"));
                 const data = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
-                    transactionCode: doc.id,
                     ...doc.data()
                 }));
+                console.log(data)
                 setRequests(data);
             } catch (error) {
                 console.log(error);
@@ -79,19 +80,18 @@ const Request = () => {
     const approve = async (docId, values) => {
         setOpenLoad(true);
         try {
-            const qrRoute = await generateQRCode(docId);
+            const qrRoute = await generateQRCode(`Schedule: ${docId}`);
             const qrDownloadUrl = await uploadQRCode(qrRoute);
             if (qrDownloadUrl) {
                 const emailTemplate = {
                     ...values,
-                    transaction_code: docId,
                     qr_code: qrDownloadUrl
                 };
                 await setDoc(doc(db, "Approved Requests", docId), {
                     ...values,
-                    transaction_code: docId,
                 });
-                await emailjs.send("service_t1pnh7h", "template_caoc6rw", emailTemplate, "w6M46-gvrb52cc9Sz");
+                deleteDoc(doc(db, "Requests", docId));
+                await emailjs.send("service_r7s7np9", "template_caoc6rw", emailTemplate, "w6M46-gvrb52cc9Sz");
                 toast.success("Email sent successfully");
                 setOpenLoad(false);
             }
@@ -101,15 +101,13 @@ const Request = () => {
         }
     };
 
-    const denied = async (docId, values) => {
+    const denied =  (docId, values) => {
         setOpenLoad(true);
         try {
-               await setDoc(doc(db, "Rejected Requests", docId), {
+                setDoc(doc(db, "Rejected Requests", docId), {
                     ...values,
-                    transaction_code: docId,
                 }).then(() => {
                     deleteDoc(doc(db, "Requests", docId));
-                    setRequests(requests.filter(request => request.id !== docId));
                 });
 
                 toast.success("Request Rejected")

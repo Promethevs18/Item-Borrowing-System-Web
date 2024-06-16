@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, getFirestore, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, getFirestore, query } from 'firebase/firestore';
 import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Button } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar, useGridApiRef } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import AdminDrawer from './AdminDrawer';
@@ -13,6 +13,7 @@ const Reports = () => {
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState([]);
   const db = getFirestore();
+  const dataGridRef = useGridApiRef()
   const fieldsToIgnore = ["imageUrl", "profileImage", "itemImage", "receiptImage"];
 
   const handleChange = (event) => {
@@ -65,56 +66,58 @@ const Reports = () => {
     fetchData();
   }, [reportType]);
 
-  const generatePDF = async () => {
-    const doc = new jsPDF();
+  // const generatePDF = () => {
+  //   const doc = new jsPDF();
   
-    // Add logo
-    const logoUrl = '/perpetual-logo.png';
-    const imgWidth = 50;
-    const imgHeight = 15;
+  //   // Add logo
+  //   const logoUrl = '/perpetual-logo.png';
+  //   const imgWidth = 50;
+  //   const imgHeight = 15;
   
-    try {
-      await new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = logoUrl;
-        img.onload = () => {
-          doc.addImage(img, 'PNG', 10, 10, imgWidth, imgHeight);
-          resolve();
-        };
-        img.onerror = (error) => {
-          console.error('Error loading image:', error);
-          reject(error);
-        };
-      });
-    } catch (error) {
-      console.error('Error adding logo to PDF:', error);
-    }
+  //   try {
+  //     const img = new Image();
+  //     img.src = logoUrl;
+  //     img.onload = () => {
+  //       doc.addImage(img, 'PNG', 10, 10, imgWidth, imgHeight);
+  //       //generateContent();
+  //     };
+  //   } catch (error) {
+  //     console.error('Error adding logo to PDF:', error);
+  //    // generateContent();
+  //   }
+
+  //   // const generateContent = () => {
+  //   //   // Add header
+  //   //   doc.setFontSize(16);
+  //   //   doc.setTextColor(128, 0, 0); // Maroon color
+  //   //   doc.text("Item Borrowing System", 105, 20, { align: 'center' });
+  //   //   doc.setFontSize(12);
+  //   //   doc.setTextColor(0, 0, 0); // Black color
+  //   //   doc.text("Report Type: " + reportType.toUpperCase(), 105, 30, { align: 'center' });
   
-    // Add header
-    doc.setFontSize(16);
-    doc.setTextColor(128, 0, 0); // Maroon color
-    doc.text("Item Borrowing System", 105, 20, { align: 'center' });
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0); // Black color
-    doc.text("Report Type: " + reportType.toUpperCase(), 105, 30, { align: 'center' });
+  //   //   // Get DataGrid visible rows
+  //   //   const visibleRows = dataGridRef.current.getAllRowModels();
+  //   //   const visibleData = visibleRows.map(row => row.data); // Access the data property
+    
   
-    // Add DataGrid
-    doc.autoTable({
-      head: [columns.map((col) => col.headerName)],
-      body: rows.map((row) => columns.map((col) => row[col.field])),
-      startY: 40, // Position of DataGrid below logo and header
-      theme: 'grid',
-      styles: {
-        headerFill: [128, 0, 0], // Maroon color for header background
-        textColor: [255, 255, 255], // White color for header text
-        alternateRowFill: [245, 245, 220], // Yellow color for alternate rows
-      },
-      bodyStyles: { textColor: [0, 0, 0] } // Black color for body text
-    });
+  //   //   // Add DataGrid content
+  //   //   doc.autoTable({
+  //   //     head: [columns.map((col) => col.headerName)],
+  //   //     body: visibleData.map((row) => columns.map((col) => row[col.field])),
+  //   //     startY: 40, // Position of DataGrid below logo and header
+  //   //     theme: 'grid',
+  //   //     styles: {
+  //   //       headerFill: [128, 0, 0], // Maroon color for header background
+  //   //       textColor: [255, 255, 255], // White color for header text
+  //   //       alternateRowFill: [245, 245, 220], // Yellow color for alternate rows
+  //   //     },
+  //   //     bodyStyles: { textColor: [0, 0, 0] } // Black color for body text
+  //   //   });
   
-    // Save PDF
-    doc.save(`${reportType}_report.pdf`);
-  };
+  //   //   // Save PDF
+  //   //   doc.save(`${reportType}_report.pdf`);
+  //   // };
+  // };
 
   return (
     <div style={{ textAlign: 'center', paddingTop: '20px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -130,20 +133,19 @@ const Reports = () => {
         </FormControl>
         <div style={{ height: 400, width: '100%', marginTop: '20px', marginBottom: '20px' }}>
           <DataGrid
-            slots={{toolbar: CustomToolbar}}
+            ref={dataGridRef}
+            slots={{ toolbar: GridToolbar }}
             sx={{ 
-              "& .MuiDataGrid-virtualScrollerRenderZone": {
-                color: 'white'
-              }
-            }}
+             '@media print':{
+                    '.MuiDataGrid-main': { color: 'black' },
+                    '.MuiDataGrid-root ': { color: 'black' },
+                  }
+              }}
             rows={rows}
             columns={columns}
             pageSize={5}
           />
         </div>
-        <Button variant="contained" style={{ backgroundColor: 'yellow', color: 'black' }} onClick={generatePDF}>
-          Generate Report
-        </Button>
       </div>
       <AdminDrawer/>
     </div>

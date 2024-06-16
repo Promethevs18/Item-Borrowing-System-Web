@@ -5,9 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { toast } from 'react-toastify';
 import { getAuth, signOut } from 'firebase/auth';
+import { useAuth } from '../AuthContext';
 
-const AdminDrawer = ({user}) => {
+const AdminDrawer = () => {
     
+    const user = useAuth();
+
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -60,6 +63,7 @@ const AdminDrawer = ({user}) => {
                                     <ListItemText primary='Inventory List'/>
                                 </ListItemButton>
                             </ListItem>
+                            {user?.uid === 'rt5MKdHOWyZaAS3h5LtdsnLWXae2' && (
                             <ListItem>
                                 <ListItemButton onClick={() => navigate('/calibration')}>
                                     <ListItemIcon sx={{color: 'white'}}>
@@ -68,6 +72,7 @@ const AdminDrawer = ({user}) => {
                                     <ListItemText primary='Calibration List'/>
                                 </ListItemButton>
                             </ListItem>
+                               )}
                             <ListItem>
                                 <ListItemButton onClick={() => navigate('/requests')}>
                                     <ListItemIcon sx={{color: 'white'}}>
@@ -93,12 +98,14 @@ const AdminDrawer = ({user}) => {
                                 </ListItemButton>
                             </ListItem>
                             <ListItem>
-                                <ListItemButton onClick={() => navigate('/accountManagement')}>
-                                    <ListItemIcon sx={{color: 'white'}}>
-                                        <GroupAddIcon/>
-                                    </ListItemIcon>
-                                    <ListItemText primary='Account Management'/>
-                                </ListItemButton>
+                                {user?.uid === 'rt5MKdHOWyZaAS3h5LtdsnLWXae2' && (
+                                    <ListItemButton onClick={() => navigate('/accountManagement')}>
+                                        <ListItemIcon sx={{color: 'white'}}>
+                                            <GroupAddIcon/>
+                                        </ListItemIcon>
+                                        <ListItemText primary='Account Management'/>
+                                    </ListItemButton>
+                                )}
                             </ListItem>
                         </List>
                         <Box display='flex' justifyContent='center'>

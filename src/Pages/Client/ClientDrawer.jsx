@@ -1,4 +1,4 @@
-import { Dashboard, Inventory } from '@mui/icons-material';
+import { Category, Dashboard, Inventory } from '@mui/icons-material';
 import { Avatar, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
@@ -85,14 +85,14 @@ return (
                                   <ListItemText primary='Borrow an item'/>
                               </ListItemButton>
                           </ListItem>
-                          <ListItem>
-                              <ListItemButton onClick={() => navigate('/clientAccount')}>
+                        <ListItem>
+                              <ListItemButton onClick={() => navigate('/returned')}>
                                   <ListItemIcon sx={{color: 'white'}}>
-                                      <AccountCircleIcon/>
+                                      <Category/>
                                   </ListItemIcon>
-                                  <ListItemText primary='Account Details'/>
+                                  <ListItemText primary='Returned Items'/>
                               </ListItemButton>
-                          </ListItem>
+                          </ListItem> 
 
                       </List>
               </Box>
