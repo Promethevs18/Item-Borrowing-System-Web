@@ -2,14 +2,17 @@ import { Box, CircularProgress, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import AdminDrawer from './AdminDrawer'
 import Header from '../Header'
-import { collection, deleteDoc, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid'
 import { Check } from '@mui/icons-material'
 import { toast } from 'react-toastify'
+import { useAuth } from '../AuthContext'
 
-const Inventory = ({user}) => {
+const Inventory = () => {
 
   const database = getFirestore();
+
+  const user = useAuth()
 
   const [pendings, setPendings] = useState([]);
   const [openLoad, setOpenLoad] = useState(false);
@@ -46,7 +49,7 @@ const Inventory = ({user}) => {
 
     getReturns();
     getData();
-  }, [database]);
+  });
 
   const pendingCols = [
     { field: "transactionCode", headerName: "Transaction Code", flex: 1 },
@@ -79,13 +82,17 @@ const Inventory = ({user}) => {
   ];
 
   const returned = async (data) => {
-    toast.info(data.id)
     setOpenLoad(true);
     try {
       await setDoc(doc(database, "Returned Items", data.id), {
         ...data,
         returnedDate: new Date().toDateString()
       }).then(() => {
+        updateDoc(doc(database, "Items", data.iic), {
+          "ItemExistence": "Available"
+        })
+      })
+      .then(() => {
         deleteDoc(doc(database, "Approved Requests", data.id));
       });
       toast.success("Items are returned");
