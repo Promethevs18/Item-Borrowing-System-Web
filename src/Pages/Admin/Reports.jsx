@@ -65,64 +65,72 @@ const Reports = () => {
   useEffect(() => {
     fetchData();
   }, [reportType]);
-
   const generatePDF = () => {
     const api = dataGridRef.current;
-
+  
     if (!api) {
       return;
     }
-
+  
     // Get visible columns
     const visibleColumns = gridVisibleColumnFieldsSelector(api.state);
-
+  
     // Get filtered and sorted rows
     const visibleRows = gridFilteredSortedRowEntriesSelector(api.state);
-
+  
     const doc = new jsPDF('landscape');
-
+  
     // Add logo
     const logoUrl = '/perpetual-logo.png';
-    const imgWidth = 100;
+    const imgWidth = 125;
     const imgHeight = 25;
-
+  
     const img = new Image();
     img.src = logoUrl;
     img.onload = () => {
+      // Add the first image (logo)
       doc.addImage(img, 'PNG', 10, 10, imgWidth, imgHeight);
-
-      // Add header
-      doc.setFontSize(16);
-      doc.setTextColor(128, 0, 0); // Maroon color
-      doc.text("Item Borrowing System", 105, 20, { align: 'center' });
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0); // Black color
-      doc.text("Report Type: " + reportType.toUpperCase(), 105, 30, { align: 'center' });
-
-      // Add DataGrid content
-      const rowsData = visibleRows.map(({ model }) => 
-        visibleColumns.map((colField) => model[colField])
-      );
-
-      const headers = visibleColumns.map((colField) => columns.find(col => col.field === colField).headerName);
-
-      doc.autoTable({
-        head: [headers],
-        body: rowsData,
-        startY: 40, // Position of DataGrid below logo and header
-        theme: 'grid',
-        styles: {
-          headerFill: [128, 0, 0], // Maroon color for header background
-          textColor: [255, 255, 255], // White color for header text
-          alternateRowFill: [245, 245, 220], // Yellow color for alternate rows
-        },
-        bodyStyles: { textColor: [0, 0, 0] } // Black color for body text
-      });
-
-      // Save PDF
-      doc.save(`${reportType}_report.pdf`);
+  
+      // Load and position the second image
+      const secondImgUrl = '/Picture2.png';
+      const secondImg = new Image();
+      secondImg.src = secondImgUrl;
+      secondImg.onload = () => {
+        const x2 = 215; // Adjust x-coordinate to position second image next to the first image
+        doc.addImage(secondImg, 'PNG', x2, 15, 60, 20);
+  
+        // Add header
+        
+        doc.setFontSize(16).setFont(undefined, 'bold');
+        doc.setTextColor(128, 0, 0); // Maroon color
+        doc.text("INVENTORY OF BSECE LABORATORY TOOLS & EQUIPMENTS S.Y. 2022 – 2023", 150, 50, { align: 'center',  });
+        
+        // Add DataGrid content
+        const rowsData = visibleRows.map(({ model }) => 
+          visibleColumns.map((colField) => model[colField])
+        );
+  
+        const headers = visibleColumns.map((colField) => columns.find(col => col.field === colField).headerName);
+  
+        doc.autoTable({
+          head: [headers],
+          body: rowsData,
+          startY: 60, // Position of DataGrid below logo and header
+          theme: 'grid',
+          styles: {
+            headerFill: [128, 0, 0], // Maroon color for header background
+            textColor: [255, 255, 255], // White color for header text
+            alternateRowFill: [245, 245, 220], // Yellow color for alternate rows
+          },
+          bodyStyles: { textColor: [0, 0, 0] } // Black color for body text
+        });
+  
+        // Save PDF
+        doc.save(`${reportType}_report.pdf`);
+      };
     };
   };
+  
 
   return (
     <div style={{ textAlign: 'center', paddingTop: '20px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

@@ -34,11 +34,6 @@ const AccountManagement = () => {
     const [accountLevel, setAccountLevel] = useState([])
     const [selectionModel, setSelectionModel] = useState([])
 
-    const [selectedCategory, setCategory] = useState('')
-    const categoryChange = (event) => {
-        setCategory(event.target.value)
-    }
-
     const userSchema = yup.object().shape({
         email: yup.string().required("This field is required"),
         fullName:  yup.string().required("This field is required"),
@@ -125,7 +120,6 @@ const AccountManagement = () => {
 
     const dataColumn = [
       { field: "fullName", headerName: "Full Name", flex: 1},
-      { field: "category", headerName: "Category", flex: 1},
       { field: "email", headerName: "Email", flex: 1},
       { field: "accountLevel", headerName: "Account Level", flex: 1},
       { field: "status", headerName: "Account Status", flex: 1},

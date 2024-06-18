@@ -57,19 +57,14 @@ const Inventory = () => {
     { field: "date", headerName: "Date Requested", flex: 1 },
     { field: "iic", headerName: "IIC", flex: 1 },
     { field: "tools", headerName: "Tools borrowed", flex: 1 },
-    { field: 'actions', type: 'actions', headerName: "Action", flex: 1, getActions: (params) => {
-      const actions = []
-      if(user?.uid === 'rt5MKdHOWyZaAS3h5LtdsnLWXae2'){
-        actions.push(
+    { field: 'actions', type: 'actions', headerName: "Action", flex: 1, getActions: (params) => [
           <GridActionsCellItem
             icon={<Check />}
             label="Accept"
             onClick={() => returned(params.row)}
           />
-        )
-      }
-     return actions
-    }}
+        ]
+    }
   ];
 
   const returnedCols = [

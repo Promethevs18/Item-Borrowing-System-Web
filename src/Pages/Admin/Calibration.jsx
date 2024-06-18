@@ -8,11 +8,7 @@ import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc } fro
 import { toast } from 'react-toastify'
 import DeleteIcon from '@mui/icons-material/Delete';
 import AdminDrawer from './AdminDrawer'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import CustomToolBar from '../CustomToolBar'
-import { useAuth } from '../AuthContext'
 
 const Calibration = () => {
     
@@ -30,7 +26,7 @@ const Calibration = () => {
         iic: "",
         stickerNo: "",
         dateCalibrated: "",
-        expirationDate: null, // Added expirationDate field
+        expirationDate: "", // Added expirationDate field
     };
     
     const formikRef = useRef(null);
@@ -218,22 +214,24 @@ const Calibration = () => {
                                             }
                                             sx={{ maxWidth: "50%", marginLeft: "15px", marginTop: "10px" }}
                                         />
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker
-                                                label="Expiration Date"
-                                                value={values.expirationDate}
-                                                onChange={(date) => {
-                                                    handleChange({
-                                                        target: {
-                                                            name: "expirationDate",
-                                                            value: date,
-                                                        },
-                                                    });
-                                                }}
-                                               
-                                                sx={{ maxWidth: "50%", marginLeft: "15px", marginTop: "10px" }}
-                                            />
-                                        </LocalizationProvider>
+                                         <TextField
+                                            variant="filled"
+                                            fullWidth
+                                            type="text"
+                                            value={values.expirationDate}
+                                            onBlur={handleBlur}
+                                            onChange={handleChange}
+                                            label="Expiration Date"
+                                            name="expirationDate"
+                                            error={!!touched.expirationDate && !!errors.expirationDate}
+                                            helperText={
+                                                touched.expirationDate && (
+                                                    <span className="error-message">{errors.expirationDate}</span>
+                                                )
+                                            }
+                                            sx={{ maxWidth: "50%", marginLeft: "15px", marginTop: "10px" }}
+                                        />
+                                      
                                     </Box>
                                     <Box display="flex" m="5px">
                                         <TextField
