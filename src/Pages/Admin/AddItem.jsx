@@ -40,6 +40,7 @@ const AddItem = () => {
     iic: '',
     assetName: '',
     brandModel: '',
+    inventoryTag: '',
     genSpecs: '',
     location: '',
     receiptImage: '',
@@ -55,6 +56,7 @@ const AddItem = () => {
     brandModel: yup.string().required("This field is required"),
     genSpecs: yup.string().required("This field is required"),
     location: yup.string().required("This field is required"),
+    inventoryTag: yup.string().required("This field is required"),
     quantity: yup.number().required("This field is required").min(1, "Quantity must be at least 1") // Validate quantity
   });
 
@@ -289,6 +291,21 @@ const AddItem = () => {
                         name='brandModel'
                         error={!!touched.brandModel && !!errors.brandModel}
                         helperText={touched.brandModel && errors.brandModel}
+                        sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        fullWidth
+                        variant='filled'
+                        type='text'
+                        label='Inventory Tag'
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.inventoryTag}
+                        name='inventory'
+                        error={!!touched.inventoryTag && !!errors.inventoryTag}
+                        helperText={touched.inventoryTag && errors.inventoryTag}
                         sx={{ width: '350px', "& .MuiInputBase-root": { color: 'black' } }}
                       />
                     </Grid>

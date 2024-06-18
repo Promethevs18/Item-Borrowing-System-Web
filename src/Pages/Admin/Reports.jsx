@@ -65,6 +65,8 @@ const Reports = () => {
   useEffect(() => {
     fetchData();
   }, [reportType]);
+
+
   const generatePDF = () => {
     const api = dataGridRef.current;
   
@@ -100,36 +102,69 @@ const Reports = () => {
         doc.addImage(secondImg, 'PNG', x2, 15, 60, 20);
   
         // Add header
-        
         doc.setFontSize(16).setFont(undefined, 'bold');
         doc.setTextColor(128, 0, 0); // Maroon color
-        doc.text("INVENTORY OF BSECE LABORATORY TOOLS & EQUIPMENTS S.Y. 2022 – 2023", 150, 50, { align: 'center',  });
-        
+        doc.text("INVENTORY OF BSECE LABORATORY TOOLS & EQUIPMENTS S.Y. 2022 – 2023", 150, 50, { align: 'center' });
+  
         // Add DataGrid content
-        const rowsData = visibleRows.map(({ model }) => 
+        const startY = 60; // Position of DataGrid below logo and header
+        const headers = visibleColumns.map((colField) => columns.find(col => col.field === colField).headerName);
+        const rowsData = visibleRows.map(({ model }) =>
           visibleColumns.map((colField) => model[colField])
         );
-  
-        const headers = visibleColumns.map((colField) => columns.find(col => col.field === colField).headerName);
   
         doc.autoTable({
           head: [headers],
           body: rowsData,
-          startY: 60, // Position of DataGrid below logo and header
+          startY: startY,
           theme: 'grid',
           styles: {
             headerFill: [128, 0, 0], // Maroon color for header background
             textColor: [255, 255, 255], // White color for header text
             alternateRowFill: [245, 245, 220], // Yellow color for alternate rows
           },
-          bodyStyles: { textColor: [0, 0, 0] } // Black color for body text
+          bodyStyles: { textColor: [0, 0, 0] }, // Black color for body text
+          didDrawPage: addFooter // Call addFooter function after drawing each page
         });
   
         // Save PDF
         doc.save(`${reportType}_report.pdf`);
       };
     };
+  
+    // Function to add footer
+    function addFooter() {
+      const pageCount = doc.internal.getNumberOfPages(); // Get total number of pages
+  
+      // Footer content
+      const footerContentLeft = {
+        text: `${reportType.toUpperCase()} Report - Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`,
+        x: 10,
+        y: doc.internal.pageSize.height - 10,
+        align: 'left'
+      };
+  
+      const footerContentRight = {
+        text: "UPHMO-COE-ACAD-1020/rev0",
+        x: doc.internal.pageSize.width - 10,
+        y: doc.internal.pageSize.height - 10,
+        align: 'right'
+      };
+  
+      // Set font style for footer
+      doc.setFontSize(10);
+      doc.setTextColor(100); // Dark gray color
+  
+      // Add left footer text
+      doc.text(footerContentLeft.text, footerContentLeft.x, footerContentLeft.y, { align: footerContentLeft.align });
+  
+      // Add right footer text
+      doc.text(footerContentRight.text, footerContentRight.x, footerContentRight.y, { align: footerContentRight.align });
+    }
   };
+  
+  
+
   
 
   return (

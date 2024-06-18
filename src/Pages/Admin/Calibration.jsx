@@ -82,10 +82,10 @@ const Calibration = () => {
         { field: "number", headerName: "Number", flex: 1 },
         { field: "instrumentType", headerName: "Instrument Type", flex: 1 },
         { field: "model", headerName: "Model", flex: 1 },
-        { field: "iic", headerName: "Student iic", flex: 1 },
+        { field: "iic", headerName: "IIC", flex: 1 },
         { field: "manufacturerName", headerName: "Manufacturer's Name", flex: 1 },
         { field: "stickerNo", headerName: "Sticker No.", flex: 1 },
-        { field: "dateCalibrated", headerName: "Date Calibrated", flex: 1 },
+        { field: "dateCalibrated", headerName: "Date for Calibration", flex: 1 },
         { field: "expirationDate", headerName: "Expiration Date", flex: 1 }, // Added column for expirationDate
         {
             field: "actions", type: 'actions', headerName: 'Action', flex: 1, getActions: (params) => [
