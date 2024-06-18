@@ -17,8 +17,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import QRCode from 'react-qr-code';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CustomToolbar from '../CustomToolBar'
+import { useAuth } from '../AuthContext';
 
-const AddItem = ({ user }) => {
+const AddItem = () => {
   const db = getFirestore();
   const storage = getStorage();
   const [openLoad, setOpenLoad] = useState(false);
@@ -45,6 +46,8 @@ const AddItem = ({ user }) => {
     quantity: 0, // Add quantity
     status: 'Available' // Add status
   };
+
+  const user = useAuth();
 
   const validation = yup.object().shape({
     iic: yup.string().required("This field is required"),
@@ -228,6 +231,7 @@ const AddItem = ({ user }) => {
       )}
       <Header title='Inventory List' description='Create a new item/material that is ready for students/teachers to borrow' />
       <Box m='20px' justifyContent='space-around' alignSelf='center' display='flex' marginTop='100px'>
+
         {user?.uid === 'rt5MKdHOWyZaAS3h5LtdsnLWXae2' && !showForm && (
             <Button variant="contained" onClick={handleButtonClick}>Add New Item</Button>
         )}
